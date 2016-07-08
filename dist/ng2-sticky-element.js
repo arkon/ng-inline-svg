@@ -17,12 +17,19 @@ var StickyElement = (function () {
     StickyElement.prototype.ngOnInit = function () {
         var _this = this;
         this._relativeEl = this._el.nativeElement.closest(this.sticky);
-        this._raf = window.requestAnimationFrame(function () {
-            _this._getPos();
-        });
+        if (this._relativeEl) {
+            this._raf = window.requestAnimationFrame(function () {
+                _this._getPos();
+            });
+        }
+        else {
+            console.error("[ng2-sticky-element] Couldn't find an element with selector \"" + this.sticky + "\"");
+        }
     };
     StickyElement.prototype.ngOnDestroy = function () {
-        window.cancelAnimationFrame(this._raf);
+        if (this._raf) {
+            window.cancelAnimationFrame(this._raf);
+        }
     };
     StickyElement.prototype._getPos = function () {
         this._relativeElPos = this._relativeEl.getBoundingClientRect();

@@ -5,8 +5,9 @@ import { StickyElement } from 'ng2-sticky-element';
   selector: 'demo',
   directives: [StickyElement],
   template: `
-    <div class="test"></div>
-    <div [sticky]="'.test'">Sticky</div>
+    <div class="test">
+      <div [sticky]="'.test'">Sticky</div>
+    </div>
   `
 })
 export class DemoComponent {

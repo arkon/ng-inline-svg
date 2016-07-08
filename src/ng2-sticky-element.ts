@@ -24,13 +24,19 @@ export class StickyElement implements OnInit, OnDestroy {
   ngOnInit() {
     this._relativeEl = this._el.nativeElement.closest(this.sticky);
 
-    this._raf = window.requestAnimationFrame(() => {
-      this._getPos();
-    });
+    if (this._relativeEl) {
+      this._raf = window.requestAnimationFrame(() => {
+        this._getPos();
+      });
+    } else {
+      console.error(`[ng2-sticky-element] Couldn't find an element with selector "${this.sticky}"`);
+    }
   }
 
   ngOnDestroy() {
-    window.cancelAnimationFrame(this._raf);
+    if (this._raf) {
+      window.cancelAnimationFrame(this._raf);
+    }
   }
 
   private _getPos() {
