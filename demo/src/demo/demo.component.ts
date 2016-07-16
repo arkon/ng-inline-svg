@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
-import { StickyElement } from 'ng2-sticky-element';
+import InlineSVG from 'ng2-inline-svg';
 
 @Component({
   selector: 'demo',
-  directives: [StickyElement],
+  directives: [InlineSVG],
   template: `
-    <div class="test">
-      <div [sticky]="'.test'">Sticky</div>
-    </div>
+    <div [inline-svg]="./file.svg"></div>
   `
 })
 export class DemoComponent {

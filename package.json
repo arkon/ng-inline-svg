@@ -1,14 +1,14 @@
 {
-  "name": "ng2-sticky-element",
+  "name": "ng2-inline-svg",
   "version": "0.0.1",
   "description": "Angular 2 directive for positioning a fixed element relative to another.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arkon/ng2-sticky-element.git"
+    "url": "https://github.com/arkon/ng2-inline-svg.git"
   },
-  "homepage": "http://echeung.me/ng2-sticky-element/",
+  "homepage": "http://echeung.me/ng2-inline-svg/",
   "bugs": {
-    "url": "https://github.com/arkon/ng2-sticky-element/issues"
+    "url": "https://github.com/arkon/ng2-inline-svg/issues"
   },
   "files": [
     "src/*",
@@ -26,8 +26,8 @@
     "positioning",
     "position"
   ],
-  "main": "./dist/ng2-sticky-element.js",
-  "typings": "./dist/ng2-sticky-element.d.ts",
+  "main": "./dist/ng2-inline-svg.js",
+  "typings": "./dist/ng2-inline-svg.d.ts",
   "scripts": {
     "start": "typings install && tsc --p ./tsconfig.json",
     "prepublish": "npm start"
