@@ -9,7 +9,8 @@
     "outDir": "dist/"
   },
   "files": [
-    "src/ng2-sticky-element.ts",
+    "src/ng2-inline-svg.ts",
+    "src/svg-cache.ts",
     "typings/index.d.ts"
   ],
   "compileOnSave": false,

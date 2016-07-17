@@ -3,31 +3,32 @@ import {
   ElementRef,
   EventEmitter,
   Input,
-  OnDestroy,
   OnInit,
-  Output,
-  Renderer
+  Output
 } from '@angular/core';
+
 import SVGCache from './svg-cache';
 
 @Directive({ selector: '[inline-svg]' })
-export default class InlineSVG implements OnInit, OnDestroy {
+export default class InlineSVG implements OnInit {
   @Input('inline-svg') url: string;
 
-  constructor(private _http: Http, private _el: ElementRef, private _renderer: Renderer) {
+  @Output() onSVGInserted: EventEmitter<any> = new EventEmitter<any>();
+
+  constructor(private _el: ElementRef) {
   }
 
   ngOnInit() {
-    const svg = SVGCache.instance.getSVG(this.url);
-
-    // When observable/promise resolves:
-    this._insertSVG(svg);
+    SVGCache.getSVG(this.url)
+      .subscribe(
+        (svg) => {
+          this._insertSVG(svg);
+          this.onSVGInserted.emit(null);
+        }
+      );
   }
 
-  ngOnDestroy() {
-  }
-
-  _insertSVG(data) {
+  private _insertSVG(data) {
     this._el.nativeElement.innerHTML = data;
   }
 }

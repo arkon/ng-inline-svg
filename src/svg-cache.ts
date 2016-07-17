@@ -1,23 +1,24 @@
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/observable';
 import { Http } from '@angular/http';
 
+@Injectable()
 export default class SVGCache {
-  private _instance: SVGCache;
-  private _cache: Map<string, any>;
+  private static _http: Http;
+  private static _cache: Map<string, any>;
 
-  constructor() {
-    this._cache = new Map();
-  }
-
-  get INSTANCE() {
-    if (!this._instance) {
-      this._instance = new SVGCache();
+  constructor(_http: Http) {
+    if (!SVGCache._cache) {
+      SVGCache._cache = new Map<string, any>();
     }
 
-    return this._instance;
+    if (!SVGCache._http) {
+      SVGCache._http = _http;
+    }
   }
 
-  getSVG(url: string, svg: any) {
-    // Observable/promise?
+  static getSVG(url: string): Observable<any> {
+    // TODO: make this an observable?
 
     // Return cached copy if it exists
     if (this._cache.has(url)) {
@@ -25,16 +26,14 @@ export default class SVGCache {
     }
 
     // Otherwise, make the HTTP call to fetch
-    return this._http.get(url)
-      .map(res => res.json())
+    this._http.get(url)
       .subscribe(
         (data) => {
-          this._cache.add(url, data);
+          this._cache.set(url, data);
 
           return data;
         },
         (err) => console.error(err)
       );
-
   }
 }
