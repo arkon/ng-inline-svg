@@ -5,7 +5,7 @@ import InlineSVG from 'ng2-inline-svg';
   selector: 'demo',
   directives: [InlineSVG],
   template: `
-    <div [inline-svg]="./file.svg"></div>
+    <div [inline-svg]="/img/image.svg"></div>
   `
 })
 export class DemoComponent {
