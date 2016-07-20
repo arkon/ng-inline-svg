@@ -1,0 +1,63 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var core_1 = require('@angular/core');
+var observable_1 = require('rxjs/observable');
+var http_1 = require('@angular/http');
+require('rxjs/add/observable/of');
+require('rxjs/add/operator/catch');
+require('rxjs/add/operator/do');
+require('rxjs/add/operator/map');
+require('rxjs/add/operator/share');
+var SVGCache = (function () {
+    function SVGCache(_http) {
+        this._http = _http;
+        this._cache = new Map();
+    }
+    SVGCache.prototype.getSVG = function (url) {
+        // TODO: make this an observable?
+        var _this = this;
+        // Return cached copy if it exists
+        if (this._cache.has(url)) {
+            return observable_1.Observable.of(this._cache.get(url));
+        }
+        // Otherwise, make the HTTP call to fetch
+        return this._http.get(url)
+            .map(function (res) { return res.text(); })
+            .catch(function (err, caught) {
+            console.error("Loading SVG icon URL: " + url + " failed: " + err);
+            return observable_1.Observable.of(null);
+        })
+            .do(function (svg) {
+            // Cache SVG element.
+            if (svg) {
+                var svgElement = _this._svgElementFromString(svg);
+                _this._cache.set(url, svgElement);
+                return observable_1.Observable.of(svgElement);
+            }
+        });
+    };
+    SVGCache.prototype._svgElementFromString = function (str) {
+        var div = document.createElement('DIV');
+        div.innerHTML = str;
+        var svg = div.querySelector('svg');
+        if (!svg) {
+            throw new Error('No SVG found');
+        }
+        return svg;
+    };
+    SVGCache = __decorate([
+        core_1.Injectable(), 
+        __metadata('design:paramtypes', [http_1.Http])
+    ], SVGCache);
+    return SVGCache;
+}());
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = SVGCache;

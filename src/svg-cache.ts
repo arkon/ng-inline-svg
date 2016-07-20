@@ -1,39 +1,57 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/observable';
 import { Http } from '@angular/http';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/share';
 
 @Injectable()
 export default class SVGCache {
-  private static _http: Http;
-  private static _cache: Map<string, any>;
+  private _cache: Map<string, SVGElement>;
 
-  constructor(_http: Http) {
-    if (!SVGCache._cache) {
-      SVGCache._cache = new Map<string, any>();
-    }
-
-    if (!SVGCache._http) {
-      SVGCache._http = _http;
-    }
+  constructor(private _http: Http) {
+    this._cache = new Map<string, SVGElement>();
   }
 
-  static getSVG(url: string): Observable<any> {
+  getSVG(url: string): Observable<SVGElement> {
     // TODO: make this an observable?
 
     // Return cached copy if it exists
     if (this._cache.has(url)) {
-      return this._cache.get(url);
+      return Observable.of(this._cache.get(url));
     }
 
     // Otherwise, make the HTTP call to fetch
-    this._http.get(url)
-      .subscribe(
-        (data) => {
-          this._cache.set(url, data);
+    return this._http.get(url)
+      .map(res => res.text())
+      .catch((err: any, caught: Observable<string>): Observable<SVGElement> => {
+        console.error(`Loading SVG icon URL: ${url} failed: ${err}`);
+        return Observable.of(null);
+      })
+      .do(svg => {
+        // Cache SVG element.
+        if (svg) {
+          const svgElement = this._svgElementFromString(svg as any as string);
 
-          return data;
-        },
-        (err) => console.error(err)
-      );
+          this._cache.set(url, svgElement);
+
+          return Observable.of(svgElement);
+        }
+      });
+  }
+
+  private _svgElementFromString(str: string): SVGElement {
+    const div = document.createElement('DIV');
+    div.innerHTML = str;
+
+    const svg = div.querySelector('svg') as SVGElement;
+
+    if (!svg) {
+      throw new Error('No SVG found');
+    }
+
+    return svg;
   }
 }
