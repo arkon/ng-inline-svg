@@ -14,15 +14,16 @@ var InlineSVG = (function () {
     function InlineSVG(_el, _svgCache) {
         this._el = _el;
         this._svgCache = _svgCache;
+        this.cacheSVG = true;
         this.onSVGInserted = new core_1.EventEmitter();
     }
     InlineSVG.prototype.ngOnInit = function () {
         var _this = this;
-        if (!this.url) {
+        if (!this.inlineSVG) {
             console.error('No URL passed to [inline-svg]!');
             return;
         }
-        this._svgCache.getSVG(this.url)
+        this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
             .subscribe(function (svg) {
             if (svg) {
                 _this._el.nativeElement.innerHTML = svg;
@@ -33,16 +34,20 @@ var InlineSVG = (function () {
         });
     };
     __decorate([
-        core_1.Input('inline-svg'), 
+        core_1.Input(), 
         __metadata('design:type', String)
-    ], InlineSVG.prototype, "url", void 0);
+    ], InlineSVG.prototype, "inlineSVG", void 0);
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', Boolean)
+    ], InlineSVG.prototype, "cacheSVG", void 0);
     __decorate([
         core_1.Output(), 
         __metadata('design:type', core_1.EventEmitter)
     ], InlineSVG.prototype, "onSVGInserted", void 0);
     InlineSVG = __decorate([
         core_1.Directive({
-            selector: '[inline-svg]',
+            selector: '[inlineSVG]',
             providers: [svg_cache_1.default]
         }), 
         __metadata('design:paramtypes', [core_1.ElementRef, svg_cache_1.default])

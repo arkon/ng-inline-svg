@@ -17,18 +17,19 @@ export default class SVGCache {
   }
 
   getSVG(url: string, cache: boolean): Observable<SVGElement> {
-    // TODO: resolve full absolute URL path first?
+    // Get full absolute URL path first
+    const absUrl = this._getAbsoluteUrl(url);
 
     // Return cached copy if it exists
-    if (cache && SVGCache._cache.has(url)) {
-      return Observable.of(SVGCache._cache.get(url));
+    if (cache && SVGCache._cache.has(absUrl)) {
+      return Observable.of(SVGCache._cache.get(absUrl));
     }
 
     // Otherwise, make the HTTP call to fetch
-    return this._http.get(url)
+    return this._http.get(absUrl)
       .map(res => res.text())
       .catch((err: any, caught: Observable<string>): Observable<SVGElement> => {
-        console.error(`Loading SVG icon from URL ${url} failed`, err);
+        console.error(`Loading SVG icon from URL ${absUrl} failed`, err);
 
         return Observable.of(null);
       })
@@ -38,7 +39,7 @@ export default class SVGCache {
 
           // Cache SVG element
           if (cache) {
-            SVGCache._cache.set(url, svgElement);
+            SVGCache._cache.set(absUrl, svgElement);
           }
 
           return Observable.of(svgElement);
@@ -47,7 +48,7 @@ export default class SVGCache {
   }
 
   private _svgElementFromString(str: string): SVGElement {
-    const div = document.createElement('DIV');
+    const div = document.createElement('DIV') as HTMLElement;
     div.innerHTML = str;
 
     const svg = div.querySelector('svg') as SVGElement;
@@ -57,5 +58,12 @@ export default class SVGCache {
     }
 
     return svg;
+  }
+
+  private _getAbsoluteUrl(url: string) {
+    const base = document.createElement('BASE') as HTMLBaseElement;
+    base.href = url;
+
+    return base.href
   }
 }

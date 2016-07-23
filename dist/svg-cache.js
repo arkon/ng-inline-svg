@@ -22,21 +22,24 @@ var SVGCache = (function () {
             SVGCache._cache = new Map();
         }
     }
-    SVGCache.prototype.getSVG = function (url) {
+    SVGCache.prototype.getSVG = function (url, cache) {
         var _this = this;
-        if (SVGCache._cache.has(url)) {
-            return Observable_1.Observable.of(SVGCache._cache.get(url));
+        var absUrl = this._getAbsoluteUrl(url);
+        if (cache && SVGCache._cache.has(absUrl)) {
+            return Observable_1.Observable.of(SVGCache._cache.get(absUrl));
         }
-        return this._http.get(url)
+        return this._http.get(absUrl)
             .map(function (res) { return res.text(); })
             .catch(function (err, caught) {
-            console.error("Loading SVG icon from URL " + url + " failed", err);
+            console.error("Loading SVG icon from URL " + absUrl + " failed", err);
             return Observable_1.Observable.of(null);
         })
             .do(function (svg) {
             if (svg) {
                 var svgElement = _this._svgElementFromString(svg);
-                SVGCache._cache.set(url, svgElement);
+                if (cache) {
+                    SVGCache._cache.set(absUrl, svgElement);
+                }
                 return Observable_1.Observable.of(svgElement);
             }
         });
@@ -49,6 +52,11 @@ var SVGCache = (function () {
             throw new Error('No SVG found in loaded contents');
         }
         return svg;
+    };
+    SVGCache.prototype._getAbsoluteUrl = function (url) {
+        var base = document.createElement('BASE');
+        base.href = url;
+        return base.href;
     };
     SVGCache = __decorate([
         core_1.Injectable(), 

@@ -8,6 +8,7 @@ export default class SVGCache {
     private _http;
     private static _cache;
     constructor(_http: Http);
-    getSVG(url: string): Observable<SVGElement>;
+    getSVG(url: string, cache: boolean): Observable<SVGElement>;
     private _svgElementFromString(str);
+    private _getAbsoluteUrl(url);
 }

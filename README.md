@@ -42,14 +42,14 @@ import InlineSVG from 'ng2-inline-svg';
   selector: 'app',
   directives: [InlineSVG],
   template: `
-    <div class="my-icon" aria-label="My icon" [inline-svg]="'/img/image.svg'"></div>
+    <div class="my-icon" aria-label="My icon" [inlineSVG]="'/img/image.svg'"></div>
   `
 })
 export class App {
 }
 ```
 
-The SVG file (if found) will be inserted *inside* the element with the `[inline-svg]` directive.
+The SVG file (if found) will be inserted *inside* the element with the `[inlineSVG]` directive.
 
 
 *To be documented...*

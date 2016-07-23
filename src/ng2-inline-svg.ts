@@ -10,11 +10,11 @@ import {
 import SVGCache from './svg-cache';
 
 @Directive({
-  selector: '[inline-svg]',
+  selector: '[inlineSVG]',
   providers: [SVGCache]
 })
 export default class InlineSVG implements OnInit {
-  @Input('inline-svg') url: string;
+  @Input() inlineSVG: string;
   @Input() cacheSVG: boolean = true;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
@@ -23,12 +23,12 @@ export default class InlineSVG implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.url) {
+    if (!this.inlineSVG) {
       console.error('No URL passed to [inline-svg]!');
       return;
     }
 
-    this._svgCache.getSVG(this.url, this.cacheSVG)
+    this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
       .subscribe(
         (svg: SVGElement) => {
           if (svg) {
