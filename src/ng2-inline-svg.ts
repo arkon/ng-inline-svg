@@ -16,19 +16,26 @@ import SVGCache from './svg-cache';
 export default class InlineSVG implements OnInit {
   @Input('inline-svg') url: string;
 
-  @Output() onSVGInserted: EventEmitter<any> = new EventEmitter<any>();
+  @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
 
   constructor(private _el: ElementRef, private _svgCache: SVGCache) {
   }
 
   ngOnInit() {
+    if (!this.url) {
+      console.error('No URL passed to [inline-svg]!');
+      return;
+    }
+
     this._svgCache.getSVG(this.url)
       .subscribe(
-        (svg) => {
-          this._el.nativeElement.innerHTML = svg;
-          this.onSVGInserted.emit(null);
+        (svg: SVGElement) => {
+          if (svg) {
+            this._el.nativeElement.innerHTML = svg;
+            this.onSVGInserted.emit(svg);
+          }
         },
-        (err) => {
+        (err: any) => {
           console.error(err);
         }
       );

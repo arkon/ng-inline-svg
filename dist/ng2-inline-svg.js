@@ -18,14 +18,19 @@ var InlineSVG = (function () {
     }
     InlineSVG.prototype.ngOnInit = function () {
         var _this = this;
+        if (!this.url) {
+            console.error('No URL passed to [inline-svg]!');
+            return;
+        }
         this._svgCache.getSVG(this.url)
             .subscribe(function (svg) {
-            _this._insertSVG(svg);
-            _this.onSVGInserted.emit(null);
+            if (svg) {
+                _this._el.nativeElement.innerHTML = svg;
+                _this.onSVGInserted.emit(svg);
+            }
+        }, function (err) {
+            console.error(err);
         });
-    };
-    InlineSVG.prototype._insertSVG = function (data) {
-        this._el.nativeElement.innerHTML = data;
     };
     __decorate([
         core_1.Input('inline-svg'), 

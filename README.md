@@ -4,10 +4,11 @@
 
 **[Demo](http://echeung.me/ng2-inline-svg)**
 
-Angular 2 directive for inserting an SVG file inline within an element.
+Angular 2 directive for inserting an SVG file inline within an element, allowing for easily styling
+SVGs with CSS like `fill: currentColor;`.
 
-Based on [md-icon](https://github.com/angular/material2/tree/master/src/components/icon), except
-this is meant purely for inserting SVG files within an element, without the extra things like
+This is based on [md-icon](https://github.com/angular/material2/tree/master/src/components/icon),
+except this is meant purely for inserting SVG files within an element, without the extra things like
 font icons.
 
 
@@ -20,7 +21,7 @@ npm install --save ng2-inline-svg
 
 ## Usage
 
-Make sure to add `HTTP_PROVIDERS` to your bootstrap providers:
+Make sure to add `HTTP_PROVIDERS` to your list of bootstrap providers:
 
 ```typescript
 import { bootstrap } from '@angular/platform-browser-dynamic';
@@ -38,14 +39,21 @@ import { Component } from '@angular/core';
 import InlineSVG from 'ng2-inline-svg';
 
 @Component({
-  selector: 'demo',
+  selector: 'app',
   directives: [InlineSVG],
   template: `
-    <div class="demo-svg" aria-label="My icon" [inline-svg]="'/img/image.svg'"></div>
+    <div class="my-icon" aria-label="My icon" [inline-svg]="'/img/image.svg'"></div>
   `
 })
-export class DemoComponent {
+export class App {
 }
 ```
 
 The SVG file (if found) will be inserted *inside* the element with the `[inline-svg]` directive.
+
+
+*To be documented...*
+
+`onSVGInserted`
+
+Cache

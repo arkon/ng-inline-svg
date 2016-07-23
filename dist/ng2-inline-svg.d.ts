@@ -4,8 +4,7 @@ export default class InlineSVG implements OnInit {
     private _el;
     private _svgCache;
     url: string;
-    onSVGInserted: EventEmitter<any>;
+    onSVGInserted: EventEmitter<SVGElement>;
     constructor(_el: ElementRef, _svgCache: SVGCache);
     ngOnInit(): void;
-    private _insertSVG(data);
 }

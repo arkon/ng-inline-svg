@@ -9,33 +9,34 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var Observable_1 = require('rxjs/Observable');
 var http_1 = require('@angular/http');
+var Observable_1 = require('rxjs/Observable');
 require('rxjs/add/observable/of');
 require('rxjs/add/operator/catch');
 require('rxjs/add/operator/do');
 require('rxjs/add/operator/map');
-require('rxjs/add/operator/share');
 var SVGCache = (function () {
     function SVGCache(_http) {
         this._http = _http;
-        this._cache = new Map();
+        if (!SVGCache._cache) {
+            SVGCache._cache = new Map();
+        }
     }
     SVGCache.prototype.getSVG = function (url) {
         var _this = this;
-        if (this._cache.has(url)) {
-            return Observable_1.Observable.of(this._cache.get(url));
+        if (SVGCache._cache.has(url)) {
+            return Observable_1.Observable.of(SVGCache._cache.get(url));
         }
         return this._http.get(url)
             .map(function (res) { return res.text(); })
             .catch(function (err, caught) {
-            console.error("Loading SVG icon URL: " + url + " failed: " + err);
+            console.error("Loading SVG icon from URL " + url + " failed", err);
             return Observable_1.Observable.of(null);
         })
             .do(function (svg) {
             if (svg) {
                 var svgElement = _this._svgElementFromString(svg);
-                _this._cache.set(url, svgElement);
+                SVGCache._cache.set(url, svgElement);
                 return Observable_1.Observable.of(svgElement);
             }
         });
@@ -45,7 +46,7 @@ var SVGCache = (function () {
         div.innerHTML = str;
         var svg = div.querySelector('svg');
         if (!svg) {
-            throw new Error('No SVG found');
+            throw new Error('No SVG found in loaded contents');
         }
         return svg;
     };
