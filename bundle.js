@@ -62342,7 +62342,7 @@
 	        core_1.Component({
 	            selector: 'demo',
 	            directives: [ng2_inline_svg_1.default],
-	            template: "\n    <div class=\"demo-svg\" aria-label=\"My icon\" [inline-svg]=\"'/img/image.svg'\"></div>\n  "
+	            template: "\n    <div class=\"demo-svg\" aria-label=\"My icon\" [inline-svg]=\"'img/image.svg'\"></div>\n  "
 	        }), 
 	        __metadata('design:paramtypes', [])
 	    ], DemoComponent);
