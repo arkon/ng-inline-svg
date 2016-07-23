@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var observable_1 = require('rxjs/observable');
+var Observable_1 = require('rxjs/Observable');
 var http_1 = require('@angular/http');
 require('rxjs/add/observable/of');
 require('rxjs/add/operator/catch');
@@ -22,25 +22,21 @@ var SVGCache = (function () {
         this._cache = new Map();
     }
     SVGCache.prototype.getSVG = function (url) {
-        // TODO: make this an observable?
         var _this = this;
-        // Return cached copy if it exists
         if (this._cache.has(url)) {
-            return observable_1.Observable.of(this._cache.get(url));
+            return Observable_1.Observable.of(this._cache.get(url));
         }
-        // Otherwise, make the HTTP call to fetch
         return this._http.get(url)
             .map(function (res) { return res.text(); })
             .catch(function (err, caught) {
             console.error("Loading SVG icon URL: " + url + " failed: " + err);
-            return observable_1.Observable.of(null);
+            return Observable_1.Observable.of(null);
         })
             .do(function (svg) {
-            // Cache SVG element.
             if (svg) {
                 var svgElement = _this._svgElementFromString(svg);
                 _this._cache.set(url, svgElement);
-                return observable_1.Observable.of(svgElement);
+                return Observable_1.Observable.of(svgElement);
             }
         });
     };

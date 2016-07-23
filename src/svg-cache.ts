@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/observable';
+import { Observable } from 'rxjs/Observable';
 import { Http } from '@angular/http';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/catch';
@@ -16,8 +16,6 @@ export default class SVGCache {
   }
 
   getSVG(url: string): Observable<SVGElement> {
-    // TODO: make this an observable?
-
     // Return cached copy if it exists
     if (this._cache.has(url)) {
       return Observable.of(this._cache.get(url));
