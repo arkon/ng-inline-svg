@@ -25,13 +25,12 @@ export default class InlineSVG implements OnInit {
     this._svgCache.getSVG(this.url)
       .subscribe(
         (svg) => {
-          this._insertSVG(svg);
+          this._el.nativeElement.innerHTML = svg;
           this.onSVGInserted.emit(null);
+        },
+        (err) => {
+          console.error(err);
         }
       );
-  }
-
-  private _insertSVG(data: SVGElement) {
-    this._el.nativeElement.innerHTML = data;
   }
 }
