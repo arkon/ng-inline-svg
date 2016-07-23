@@ -62342,7 +62342,7 @@
 	        core_1.Component({
 	            selector: 'demo',
 	            directives: [ng2_inline_svg_1.default],
-	            template: "\n    <div class=\"demo-svg\" aria-label=\"My icon\" [inline-svg]=\"'img/image.svg'\"></div>\n  "
+	            template: "\n    <div class=\"demo-svg1\" aria-label=\"My icon\" [inlineSVG]=\"'img/image.svg'\"></div>\n    <div class=\"demo-svg2\" aria-label=\"Another icon\" [inlineSVG]=\"'img/image.svg'\"></div>\n  "
 	        }), 
 	        __metadata('design:paramtypes', [])
 	    ], DemoComponent);
@@ -62371,30 +62371,40 @@
 	    function InlineSVG(_el, _svgCache) {
 	        this._el = _el;
 	        this._svgCache = _svgCache;
+	        this.cacheSVG = true;
 	        this.onSVGInserted = new core_1.EventEmitter();
 	    }
 	    InlineSVG.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this._svgCache.getSVG(this.url)
+	        if (!this.inlineSVG) {
+	            console.error('No URL passed to [inline-svg]!');
+	            return;
+	        }
+	        this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
 	            .subscribe(function (svg) {
-	            _this._insertSVG(svg);
-	            _this.onSVGInserted.emit(null);
+	            if (svg) {
+	                _this._el.nativeElement.innerHTML = svg;
+	                _this.onSVGInserted.emit(svg);
+	            }
+	        }, function (err) {
+	            console.error(err);
 	        });
 	    };
-	    InlineSVG.prototype._insertSVG = function (data) {
-	        this._el.nativeElement.innerHTML = data;
-	    };
 	    __decorate([
-	        core_1.Input('inline-svg'), 
+	        core_1.Input(), 
 	        __metadata('design:type', String)
-	    ], InlineSVG.prototype, "url", void 0);
+	    ], InlineSVG.prototype, "inlineSVG", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Boolean)
+	    ], InlineSVG.prototype, "cacheSVG", void 0);
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', core_1.EventEmitter)
 	    ], InlineSVG.prototype, "onSVGInserted", void 0);
 	    InlineSVG = __decorate([
 	        core_1.Directive({
-	            selector: '[inline-svg]',
+	            selector: '[inlineSVG]',
 	            providers: [svg_cache_1.default]
 	        }), 
 	        __metadata('design:paramtypes', [core_1.ElementRef, svg_cache_1.default])
@@ -62420,37 +62430,37 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(29);
-	var Observable_1 = __webpack_require__(62);
 	var http_1 = __webpack_require__(356);
+	var Observable_1 = __webpack_require__(62);
 	__webpack_require__(380);
 	__webpack_require__(386);
 	__webpack_require__(388);
 	__webpack_require__(390);
-	__webpack_require__(392);
 	var SVGCache = (function () {
 	    function SVGCache(_http) {
 	        this._http = _http;
-	        this._cache = new Map();
-	    }
-	    SVGCache.prototype.getSVG = function (url) {
-	        // TODO: make this an observable?
-	        var _this = this;
-	        // Return cached copy if it exists
-	        if (this._cache.has(url)) {
-	            return Observable_1.Observable.of(this._cache.get(url));
+	        if (!SVGCache._cache) {
+	            SVGCache._cache = new Map();
 	        }
-	        // Otherwise, make the HTTP call to fetch
-	        return this._http.get(url)
+	    }
+	    SVGCache.prototype.getSVG = function (url, cache) {
+	        var _this = this;
+	        var absUrl = this._getAbsoluteUrl(url);
+	        if (cache && SVGCache._cache.has(absUrl)) {
+	            return Observable_1.Observable.of(SVGCache._cache.get(absUrl));
+	        }
+	        return this._http.get(absUrl)
 	            .map(function (res) { return res.text(); })
 	            .catch(function (err, caught) {
-	            console.error("Loading SVG icon URL: " + url + " failed: " + err);
+	            console.error("Loading SVG icon from URL " + absUrl + " failed", err);
 	            return Observable_1.Observable.of(null);
 	        })
 	            .do(function (svg) {
-	            // Cache SVG element.
 	            if (svg) {
 	                var svgElement = _this._svgElementFromString(svg);
-	                _this._cache.set(url, svgElement);
+	                if (cache) {
+	                    SVGCache._cache.set(absUrl, svgElement);
+	                }
 	                return Observable_1.Observable.of(svgElement);
 	            }
 	        });
@@ -62460,9 +62470,14 @@
 	        div.innerHTML = str;
 	        var svg = div.querySelector('svg');
 	        if (!svg) {
-	            throw new Error('No SVG found');
+	            throw new Error('No SVG found in loaded contents');
 	        }
 	        return svg;
+	    };
+	    SVGCache.prototype._getAbsoluteUrl = function (url) {
+	        var base = document.createElement('BASE');
+	        base.href = url;
+	        return base.href;
 	    };
 	    SVGCache = __decorate([
 	        core_1.Injectable(), 
@@ -63080,235 +63095,6 @@
 	    return MapSubscriber;
 	}(Subscriber_1.Subscriber));
 	//# sourceMappingURL=map.js.map
-
-/***/ },
-/* 392 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var Observable_1 = __webpack_require__(62);
-	var share_1 = __webpack_require__(393);
-	Observable_1.Observable.prototype.share = share_1.share;
-	//# sourceMappingURL=share.js.map
-
-/***/ },
-/* 393 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var multicast_1 = __webpack_require__(394);
-	var Subject_1 = __webpack_require__(61);
-	function shareSubjectFactory() {
-	    return new Subject_1.Subject();
-	}
-	/**
-	 * Returns a new Observable that multicasts (shares) the original Observable. As long as there is at least one
-	 * Subscriber this Observable will be subscribed and emitting data. When all subscribers have unsubscribed it will
-	 * unsubscribe from the source Observable. Because the Observable is multicasting it makes the stream `hot`.
-	 * This is an alias for .publish().refCount().
-	 *
-	 * <img src="./img/share.png" width="100%">
-	 *
-	 * @return {Observable<T>} an Observable that upon connection causes the source Observable to emit items to its Observers
-	 * @method share
-	 * @owner Observable
-	 */
-	function share() {
-	    return multicast_1.multicast.call(this, shareSubjectFactory).refCount();
-	}
-	exports.share = share;
-	;
-	//# sourceMappingURL=share.js.map
-
-/***/ },
-/* 394 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var ConnectableObservable_1 = __webpack_require__(395);
-	/**
-	 * Returns an Observable that emits the results of invoking a specified selector on items
-	 * emitted by a ConnectableObservable that shares a single subscription to the underlying stream.
-	 *
-	 * <img src="./img/multicast.png" width="100%">
-	 *
-	 * @param {Function} selector - a function that can use the multicasted source stream
-	 * as many times as needed, without causing multiple subscriptions to the source stream.
-	 * Subscribers to the given source will receive all notifications of the source from the
-	 * time of the subscription forward.
-	 * @return {Observable} an Observable that emits the results of invoking the selector
-	 * on the items emitted by a `ConnectableObservable` that shares a single subscription to
-	 * the underlying stream.
-	 * @method multicast
-	 * @owner Observable
-	 */
-	function multicast(subjectOrSubjectFactory) {
-	    var subjectFactory;
-	    if (typeof subjectOrSubjectFactory === 'function') {
-	        subjectFactory = subjectOrSubjectFactory;
-	    }
-	    else {
-	        subjectFactory = function subjectFactory() {
-	            return subjectOrSubjectFactory;
-	        };
-	    }
-	    return new ConnectableObservable_1.ConnectableObservable(this, subjectFactory);
-	}
-	exports.multicast = multicast;
-	//# sourceMappingURL=multicast.js.map
-
-/***/ },
-/* 395 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Observable_1 = __webpack_require__(62);
-	var Subscriber_1 = __webpack_require__(67);
-	var Subscription_1 = __webpack_require__(69);
-	/**
-	 * @class ConnectableObservable<T>
-	 */
-	var ConnectableObservable = (function (_super) {
-	    __extends(ConnectableObservable, _super);
-	    function ConnectableObservable(source, subjectFactory) {
-	        _super.call(this);
-	        this.source = source;
-	        this.subjectFactory = subjectFactory;
-	    }
-	    ConnectableObservable.prototype._subscribe = function (subscriber) {
-	        return this.getSubject().subscribe(subscriber);
-	    };
-	    ConnectableObservable.prototype.getSubject = function () {
-	        var subject = this.subject;
-	        if (subject && !subject.isUnsubscribed) {
-	            return subject;
-	        }
-	        return (this.subject = this.subjectFactory());
-	    };
-	    ConnectableObservable.prototype.connect = function () {
-	        var source = this.source;
-	        var subscription = this.subscription;
-	        if (subscription && !subscription.isUnsubscribed) {
-	            return subscription;
-	        }
-	        subscription = source.subscribe(this.getSubject());
-	        subscription.add(new ConnectableSubscription(this));
-	        return (this.subscription = subscription);
-	    };
-	    ConnectableObservable.prototype.refCount = function () {
-	        return new RefCountObservable(this);
-	    };
-	    /**
-	     * This method is opened for `ConnectableSubscription`.
-	     * Not to call from others.
-	     */
-	    ConnectableObservable.prototype._closeSubscription = function () {
-	        this.subject = null;
-	        this.subscription = null;
-	    };
-	    return ConnectableObservable;
-	}(Observable_1.Observable));
-	exports.ConnectableObservable = ConnectableObservable;
-	/**
-	 * We need this JSDoc comment for affecting ESDoc.
-	 * @ignore
-	 * @extends {Ignored}
-	 */
-	var ConnectableSubscription = (function (_super) {
-	    __extends(ConnectableSubscription, _super);
-	    function ConnectableSubscription(connectable) {
-	        _super.call(this);
-	        this.connectable = connectable;
-	    }
-	    ConnectableSubscription.prototype._unsubscribe = function () {
-	        var connectable = this.connectable;
-	        connectable._closeSubscription();
-	        this.connectable = null;
-	    };
-	    return ConnectableSubscription;
-	}(Subscription_1.Subscription));
-	/**
-	 * We need this JSDoc comment for affecting ESDoc.
-	 * @ignore
-	 * @extends {Ignored}
-	 */
-	var RefCountObservable = (function (_super) {
-	    __extends(RefCountObservable, _super);
-	    function RefCountObservable(connectable, refCount) {
-	        if (refCount === void 0) { refCount = 0; }
-	        _super.call(this);
-	        this.connectable = connectable;
-	        this.refCount = refCount;
-	    }
-	    RefCountObservable.prototype._subscribe = function (subscriber) {
-	        var connectable = this.connectable;
-	        var refCountSubscriber = new RefCountSubscriber(subscriber, this);
-	        var subscription = connectable.subscribe(refCountSubscriber);
-	        if (!subscription.isUnsubscribed && ++this.refCount === 1) {
-	            refCountSubscriber.connection = this.connection = connectable.connect();
-	        }
-	        return subscription;
-	    };
-	    return RefCountObservable;
-	}(Observable_1.Observable));
-	/**
-	 * We need this JSDoc comment for affecting ESDoc.
-	 * @ignore
-	 * @extends {Ignored}
-	 */
-	var RefCountSubscriber = (function (_super) {
-	    __extends(RefCountSubscriber, _super);
-	    function RefCountSubscriber(destination, refCountObservable) {
-	        _super.call(this, null);
-	        this.destination = destination;
-	        this.refCountObservable = refCountObservable;
-	        this.connection = refCountObservable.connection;
-	        destination.add(this);
-	    }
-	    RefCountSubscriber.prototype._next = function (value) {
-	        this.destination.next(value);
-	    };
-	    RefCountSubscriber.prototype._error = function (err) {
-	        this._resetConnectable();
-	        this.destination.error(err);
-	    };
-	    RefCountSubscriber.prototype._complete = function () {
-	        this._resetConnectable();
-	        this.destination.complete();
-	    };
-	    RefCountSubscriber.prototype._resetConnectable = function () {
-	        var observable = this.refCountObservable;
-	        var obsConnection = observable.connection;
-	        var subConnection = this.connection;
-	        if (subConnection && subConnection === obsConnection) {
-	            observable.refCount = 0;
-	            obsConnection.unsubscribe();
-	            observable.connection = null;
-	            this.unsubscribe();
-	        }
-	    };
-	    RefCountSubscriber.prototype._unsubscribe = function () {
-	        var observable = this.refCountObservable;
-	        if (observable.refCount === 0) {
-	            return;
-	        }
-	        if (--observable.refCount === 0) {
-	            var obsConnection = observable.connection;
-	            var subConnection = this.connection;
-	            if (subConnection && subConnection === obsConnection) {
-	                obsConnection.unsubscribe();
-	                observable.connection = null;
-	            }
-	        }
-	    };
-	    return RefCountSubscriber;
-	}(Subscriber_1.Subscriber));
-	//# sourceMappingURL=ConnectableObservable.js.map
 
 /***/ }
 /******/ ]);
