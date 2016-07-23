@@ -54,6 +54,8 @@ The SVG file (if found) will be inserted *inside* the element with the `[inline-
 
 *To be documented...*
 
-`onSVGInserted`
+`(onSVGInserted)`
+
+`[cacheSVG]`
 
 Cache

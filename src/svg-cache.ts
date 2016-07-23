@@ -16,11 +16,11 @@ export default class SVGCache {
     }
   }
 
-  getSVG(url: string): Observable<SVGElement> {
+  getSVG(url: string, cache: boolean): Observable<SVGElement> {
     // TODO: resolve full absolute URL path first?
 
     // Return cached copy if it exists
-    if (SVGCache._cache.has(url)) {
+    if (cache && SVGCache._cache.has(url)) {
       return Observable.of(SVGCache._cache.get(url));
     }
 
@@ -37,7 +37,9 @@ export default class SVGCache {
           const svgElement = this._svgElementFromString(svg as any as string);
 
           // Cache SVG element
-          SVGCache._cache.set(url, svgElement);
+          if (cache) {
+            SVGCache._cache.set(url, svgElement);
+          }
 
           return Observable.of(svgElement);
         }

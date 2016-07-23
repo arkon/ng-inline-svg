@@ -15,6 +15,7 @@ import SVGCache from './svg-cache';
 })
 export default class InlineSVG implements OnInit {
   @Input('inline-svg') url: string;
+  @Input() cacheSVG: boolean = true;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
 
@@ -27,7 +28,7 @@ export default class InlineSVG implements OnInit {
       return;
     }
 
-    this._svgCache.getSVG(this.url)
+    this._svgCache.getSVG(this.url, this.cacheSVG)
       .subscribe(
         (svg: SVGElement) => {
           if (svg) {
