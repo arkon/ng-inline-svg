@@ -24,7 +24,7 @@ export default class InlineSVG implements OnInit {
 
   ngOnInit() {
     if (!this.inlineSVG) {
-      console.error('No URL passed to [inline-svg]!');
+      console.error('No URL passed to [inlineSVG]!');
       return;
     }
 

@@ -54,8 +54,14 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 
 ## Options
 
-`(onSVGInserted)`
+### Inputs
 
-`[cacheSVG]`
+#### `[cacheSVG]`
+Caches the SVG based on the absolute URL. Cache only persists for the (sessional) lifetime of the page.
 
-Cache
+Default: `true`
+
+### Outputs
+
+#### `(onSVGInserted)`
+Emits the `SVGElement` that was inserted.

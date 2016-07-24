@@ -20,7 +20,7 @@ var InlineSVG = (function () {
     InlineSVG.prototype.ngOnInit = function () {
         var _this = this;
         if (!this.inlineSVG) {
-            console.error('No URL passed to [inline-svg]!');
+            console.error('No URL passed to [inlineSVG]!');
             return;
         }
         this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
