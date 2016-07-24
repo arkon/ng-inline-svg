@@ -4,8 +4,8 @@
 
 **[Demo](http://echeung.me/ng2-inline-svg)**
 
-Angular 2 directive for inserting an SVG file inline within an element, allowing for easily styling
-SVGs with CSS like `fill: currentColor;`.
+Angular 2 directive for inserting an SVG inline within an element, allowing for easily styling
+with CSS like `fill: currentColor;`.
 
 This is based on [md-icon](https://github.com/angular/material2/tree/master/src/components/icon),
 except this is meant purely for inserting SVG files within an element, without the extra things like
@@ -52,7 +52,7 @@ export class App {
 The SVG file (if found) will be inserted *inside* the element with the `[inlineSVG]` directive.
 
 
-*To be documented...*
+## Options
 
 `(onSVGInserted)`
 
