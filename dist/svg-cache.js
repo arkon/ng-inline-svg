@@ -10,10 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var http_1 = require('@angular/http');
-var Observable_1 = require('rxjs/Observable');
-require('rxjs/add/observable/of');
-require('rxjs/add/operator/catch');
-require('rxjs/add/operator/do');
 require('rxjs/add/operator/map');
 var SVGCache = (function () {
     function SVGCache(_http) {
@@ -24,25 +20,28 @@ var SVGCache = (function () {
     }
     SVGCache.prototype.getSVG = function (url, cache) {
         var _this = this;
-        var absUrl = this._getAbsoluteUrl(url);
-        if (cache && SVGCache._cache.has(absUrl)) {
-            return Observable_1.Observable.of(SVGCache._cache.get(absUrl));
-        }
-        return this._http.get(absUrl)
-            .map(function (res) { return res.text(); })
-            .catch(function (err, caught) {
-            console.error("Loading SVG icon from URL " + absUrl + " failed", err);
-            return Observable_1.Observable.of(null);
-        })
-            .do(function (svg) {
-            if (svg) {
-                var svgElement = _this._svgElementFromString(svg);
-                if (cache) {
-                    SVGCache._cache.set(absUrl, svgElement);
-                }
-                return Observable_1.Observable.of(svgElement);
+        return new Promise(function (resolve, reject) {
+            var absUrl = _this._getAbsoluteUrl(url);
+            if (cache && SVGCache._cache.has(absUrl)) {
+                resolve(_this._cloneSvg(SVGCache._cache.get(absUrl)));
             }
+            _this._http.get(absUrl)
+                .map(function (res) { return res.text(); })
+                .subscribe(function (svg) {
+                if (svg) {
+                    var svgElement = _this._svgElementFromString(svg);
+                    if (cache) {
+                        SVGCache._cache.set(absUrl, svgElement);
+                    }
+                    resolve(svgElement);
+                }
+            }, function (err) { return reject(err); });
         });
+    };
+    SVGCache.prototype._getAbsoluteUrl = function (url) {
+        var base = document.createElement('BASE');
+        base.href = url;
+        return base.href;
     };
     SVGCache.prototype._svgElementFromString = function (str) {
         var div = document.createElement('DIV');
@@ -53,10 +52,8 @@ var SVGCache = (function () {
         }
         return svg;
     };
-    SVGCache.prototype._getAbsoluteUrl = function (url) {
-        var base = document.createElement('BASE');
-        base.href = url;
-        return base.href;
+    SVGCache.prototype._cloneSvg = function (svg) {
+        return svg.cloneNode(true);
     };
     SVGCache = __decorate([
         core_1.Injectable(), 

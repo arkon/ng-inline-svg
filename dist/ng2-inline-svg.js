@@ -14,6 +14,7 @@ var InlineSVG = (function () {
     function InlineSVG(_el, _svgCache) {
         this._el = _el;
         this._svgCache = _svgCache;
+        this.replaceContents = true;
         this.cacheSVG = true;
         this.onSVGInserted = new core_1.EventEmitter();
     }
@@ -24,19 +25,25 @@ var InlineSVG = (function () {
             return;
         }
         this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
-            .subscribe(function (svg) {
-            if (svg) {
-                _this._el.nativeElement.innerHTML = svg;
+            .then(function (svg) {
+            if (svg && _this._el.nativeElement) {
+                if (_this.replaceContents) {
+                    _this._el.nativeElement.innerHTML = '';
+                }
+                _this._el.nativeElement.appendChild(svg);
                 _this.onSVGInserted.emit(svg);
             }
-        }, function (err) {
-            console.error(err);
-        });
+        })
+            .catch(function (err) { return console.error(err); });
     };
     __decorate([
         core_1.Input(), 
         __metadata('design:type', String)
     ], InlineSVG.prototype, "inlineSVG", void 0);
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', Boolean)
+    ], InlineSVG.prototype, "replaceContents", void 0);
     __decorate([
         core_1.Input(), 
         __metadata('design:type', Boolean)

@@ -15,6 +15,7 @@ import SVGCache from './svg-cache';
 })
 export default class InlineSVG implements OnInit {
   @Input() inlineSVG: string;
+  @Input() replaceContents: boolean = true;
   @Input() cacheSVG: boolean = true;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
@@ -29,16 +30,16 @@ export default class InlineSVG implements OnInit {
     }
 
     this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
-      .subscribe(
-        (svg: SVGElement) => {
-          if (svg) {
-            this._el.nativeElement.innerHTML = svg;
-            this.onSVGInserted.emit(svg);
+      .then((svg: SVGElement) => {
+        if (svg && this._el.nativeElement) {
+          if (this.replaceContents) {
+            this._el.nativeElement.innerHTML = '';
           }
-        },
-        (err: any) => {
-          console.error(err);
+
+          this._el.nativeElement.appendChild(svg);
+          this.onSVGInserted.emit(svg);
         }
-      );
+      })
+      .catch((err: any) => console.error(err));
   }
 }

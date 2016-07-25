@@ -4,6 +4,7 @@ export default class InlineSVG implements OnInit {
     private _el;
     private _svgCache;
     inlineSVG: string;
+    replaceContents: boolean;
     cacheSVG: boolean;
     onSVGInserted: EventEmitter<SVGElement>;
     constructor(_el: ElementRef, _svgCache: SVGCache);

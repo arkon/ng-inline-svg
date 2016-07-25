@@ -61,6 +61,11 @@ Caches the SVG based on the absolute URL. Cache only persists for the (sessional
 
 Default: `true`
 
+#### `[replaceContents]`
+Replaces the contents of the element with the SVG instead of just appending it to its children.
+
+Default: `true`
+
 ### Outputs
 
 #### `(onSVGInserted)`
