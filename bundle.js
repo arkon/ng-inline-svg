@@ -62337,12 +62337,19 @@
 	var ng2_inline_svg_1 = __webpack_require__(378);
 	var DemoComponent = (function () {
 	    function DemoComponent() {
+	        this._showOther = false;
 	    }
+	    DemoComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        setTimeout(function () {
+	            _this._showOther = true;
+	        }, 100);
+	    };
 	    DemoComponent = __decorate([
 	        core_1.Component({
 	            selector: 'demo',
 	            directives: [ng2_inline_svg_1.default],
-	            template: "\n    <div class=\"demo-svg1\" aria-label=\"My icon\" [inlineSVG]=\"'img/image.svg'\"></div>\n    <div class=\"demo-svg2\" aria-label=\"Another icon\" [inlineSVG]=\"'img/image.svg'\"></div>\n  "
+	            template: "\n    <div class=\"demo-svg1\" aria-label=\"My icon\" [inlineSVG]=\"'img/image.svg'\"></div>\n    <div *ngIf=\"_showOther\" class=\"demo-svg2\" aria-label=\"Another icon\" [inlineSVG]=\"'img/image.svg'\"></div>\n  "
 	        }), 
 	        __metadata('design:paramtypes', [])
 	    ], DemoComponent);
@@ -62371,29 +62378,36 @@
 	    function InlineSVG(_el, _svgCache) {
 	        this._el = _el;
 	        this._svgCache = _svgCache;
+	        this.replaceContents = true;
 	        this.cacheSVG = true;
 	        this.onSVGInserted = new core_1.EventEmitter();
 	    }
 	    InlineSVG.prototype.ngOnInit = function () {
 	        var _this = this;
 	        if (!this.inlineSVG) {
-	            console.error('No URL passed to [inline-svg]!');
+	            console.error('No URL passed to [inlineSVG]!');
 	            return;
 	        }
 	        this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
-	            .subscribe(function (svg) {
-	            if (svg) {
-	                _this._el.nativeElement.innerHTML = svg;
+	            .then(function (svg) {
+	            if (svg && _this._el.nativeElement) {
+	                if (_this.replaceContents) {
+	                    _this._el.nativeElement.innerHTML = '';
+	                }
+	                _this._el.nativeElement.appendChild(svg);
 	                _this.onSVGInserted.emit(svg);
 	            }
-	        }, function (err) {
-	            console.error(err);
-	        });
+	        })
+	            .catch(function (err) { return console.error(err); });
 	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', String)
 	    ], InlineSVG.prototype, "inlineSVG", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Boolean)
+	    ], InlineSVG.prototype, "replaceContents", void 0);
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Boolean)
@@ -62431,11 +62445,7 @@
 	};
 	var core_1 = __webpack_require__(29);
 	var http_1 = __webpack_require__(356);
-	var Observable_1 = __webpack_require__(62);
 	__webpack_require__(380);
-	__webpack_require__(386);
-	__webpack_require__(388);
-	__webpack_require__(390);
 	var SVGCache = (function () {
 	    function SVGCache(_http) {
 	        this._http = _http;
@@ -62445,25 +62455,28 @@
 	    }
 	    SVGCache.prototype.getSVG = function (url, cache) {
 	        var _this = this;
-	        var absUrl = this._getAbsoluteUrl(url);
-	        if (cache && SVGCache._cache.has(absUrl)) {
-	            return Observable_1.Observable.of(SVGCache._cache.get(absUrl));
-	        }
-	        return this._http.get(absUrl)
-	            .map(function (res) { return res.text(); })
-	            .catch(function (err, caught) {
-	            console.error("Loading SVG icon from URL " + absUrl + " failed", err);
-	            return Observable_1.Observable.of(null);
-	        })
-	            .do(function (svg) {
-	            if (svg) {
-	                var svgElement = _this._svgElementFromString(svg);
-	                if (cache) {
-	                    SVGCache._cache.set(absUrl, svgElement);
-	                }
-	                return Observable_1.Observable.of(svgElement);
+	        return new Promise(function (resolve, reject) {
+	            var absUrl = _this._getAbsoluteUrl(url);
+	            if (cache && SVGCache._cache.has(absUrl)) {
+	                resolve(_this._cloneSvg(SVGCache._cache.get(absUrl)));
 	            }
+	            _this._http.get(absUrl)
+	                .map(function (res) { return res.text(); })
+	                .subscribe(function (svg) {
+	                if (svg) {
+	                    var svgElement = _this._svgElementFromString(svg);
+	                    if (cache) {
+	                        SVGCache._cache.set(absUrl, svgElement);
+	                    }
+	                    resolve(svgElement);
+	                }
+	            }, function (err) { return reject(err); });
 	        });
+	    };
+	    SVGCache.prototype._getAbsoluteUrl = function (url) {
+	        var base = document.createElement('BASE');
+	        base.href = url;
+	        return base.href;
 	    };
 	    SVGCache.prototype._svgElementFromString = function (str) {
 	        var div = document.createElement('DIV');
@@ -62474,10 +62487,8 @@
 	        }
 	        return svg;
 	    };
-	    SVGCache.prototype._getAbsoluteUrl = function (url) {
-	        var base = document.createElement('BASE');
-	        base.href = url;
-	        return base.href;
+	    SVGCache.prototype._cloneSvg = function (svg) {
+	        return svg.cloneNode(true);
 	    };
 	    SVGCache = __decorate([
 	        core_1.Injectable(), 
@@ -62495,518 +62506,12 @@
 
 	"use strict";
 	var Observable_1 = __webpack_require__(62);
-	var of_1 = __webpack_require__(381);
-	Observable_1.Observable.of = of_1.of;
-	//# sourceMappingURL=of.js.map
-
-/***/ },
-/* 381 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var ArrayObservable_1 = __webpack_require__(382);
-	exports.of = ArrayObservable_1.ArrayObservable.of;
-	//# sourceMappingURL=of.js.map
-
-/***/ },
-/* 382 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Observable_1 = __webpack_require__(62);
-	var ScalarObservable_1 = __webpack_require__(383);
-	var EmptyObservable_1 = __webpack_require__(384);
-	var isScheduler_1 = __webpack_require__(385);
-	/**
-	 * We need this JSDoc comment for affecting ESDoc.
-	 * @extends {Ignored}
-	 * @hide true
-	 */
-	var ArrayObservable = (function (_super) {
-	    __extends(ArrayObservable, _super);
-	    function ArrayObservable(array, scheduler) {
-	        _super.call(this);
-	        this.array = array;
-	        this.scheduler = scheduler;
-	        if (!scheduler && array.length === 1) {
-	            this._isScalar = true;
-	            this.value = array[0];
-	        }
-	    }
-	    ArrayObservable.create = function (array, scheduler) {
-	        return new ArrayObservable(array, scheduler);
-	    };
-	    /**
-	     * Creates an Observable that emits some values you specify as arguments,
-	     * immediately one after the other, and then emits a complete notification.
-	     *
-	     * <span class="informal">Emits the arguments you provide, then completes.
-	     * </span>
-	     *
-	     * <img src="./img/of.png" width="100%">
-	     *
-	     * This static operator is useful for creating a simple Observable that only
-	     * emits the arguments given, and the complete notification thereafter. It can
-	     * be used for composing with other Observables, such as with {@link concat}.
-	     * By default, it uses a `null` Scheduler, which means the `next`
-	     * notifications are sent synchronously, although with a different Scheduler
-	     * it is possible to determine when those notifications will be delivered.
-	     *
-	     * @example <caption>Emit 10, 20, 30, then 'a', 'b', 'c', then start ticking every second.</caption>
-	     * var numbers = Rx.Observable.of(10, 20, 30);
-	     * var letters = Rx.Observable.of('a', 'b', 'c');
-	     * var interval = Rx.Observable.interval(1000);
-	     * var result = numbers.concat(letters).concat(interval);
-	     * result.subscribe(x => console.log(x));
-	     *
-	     * @see {@link create}
-	     * @see {@link empty}
-	     * @see {@link never}
-	     * @see {@link throw}
-	     *
-	     * @param {...T} values Arguments that represent `next` values to be emitted.
-	     * @param {Scheduler} [scheduler] A {@link Scheduler} to use for scheduling
-	     * the emissions of the `next` notifications.
-	     * @return {Observable<T>} An Observable that emits each given input value.
-	     * @static true
-	     * @name of
-	     * @owner Observable
-	     */
-	    ArrayObservable.of = function () {
-	        var array = [];
-	        for (var _i = 0; _i < arguments.length; _i++) {
-	            array[_i - 0] = arguments[_i];
-	        }
-	        var scheduler = array[array.length - 1];
-	        if (isScheduler_1.isScheduler(scheduler)) {
-	            array.pop();
-	        }
-	        else {
-	            scheduler = null;
-	        }
-	        var len = array.length;
-	        if (len > 1) {
-	            return new ArrayObservable(array, scheduler);
-	        }
-	        else if (len === 1) {
-	            return new ScalarObservable_1.ScalarObservable(array[0], scheduler);
-	        }
-	        else {
-	            return new EmptyObservable_1.EmptyObservable(scheduler);
-	        }
-	    };
-	    ArrayObservable.dispatch = function (state) {
-	        var array = state.array, index = state.index, count = state.count, subscriber = state.subscriber;
-	        if (index >= count) {
-	            subscriber.complete();
-	            return;
-	        }
-	        subscriber.next(array[index]);
-	        if (subscriber.isUnsubscribed) {
-	            return;
-	        }
-	        state.index = index + 1;
-	        this.schedule(state);
-	    };
-	    ArrayObservable.prototype._subscribe = function (subscriber) {
-	        var index = 0;
-	        var array = this.array;
-	        var count = array.length;
-	        var scheduler = this.scheduler;
-	        if (scheduler) {
-	            return scheduler.schedule(ArrayObservable.dispatch, 0, {
-	                array: array, index: index, count: count, subscriber: subscriber
-	            });
-	        }
-	        else {
-	            for (var i = 0; i < count && !subscriber.isUnsubscribed; i++) {
-	                subscriber.next(array[i]);
-	            }
-	            subscriber.complete();
-	        }
-	    };
-	    return ArrayObservable;
-	}(Observable_1.Observable));
-	exports.ArrayObservable = ArrayObservable;
-	//# sourceMappingURL=ArrayObservable.js.map
-
-/***/ },
-/* 383 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Observable_1 = __webpack_require__(62);
-	/**
-	 * We need this JSDoc comment for affecting ESDoc.
-	 * @extends {Ignored}
-	 * @hide true
-	 */
-	var ScalarObservable = (function (_super) {
-	    __extends(ScalarObservable, _super);
-	    function ScalarObservable(value, scheduler) {
-	        _super.call(this);
-	        this.value = value;
-	        this.scheduler = scheduler;
-	        this._isScalar = true;
-	    }
-	    ScalarObservable.create = function (value, scheduler) {
-	        return new ScalarObservable(value, scheduler);
-	    };
-	    ScalarObservable.dispatch = function (state) {
-	        var done = state.done, value = state.value, subscriber = state.subscriber;
-	        if (done) {
-	            subscriber.complete();
-	            return;
-	        }
-	        subscriber.next(value);
-	        if (subscriber.isUnsubscribed) {
-	            return;
-	        }
-	        state.done = true;
-	        this.schedule(state);
-	    };
-	    ScalarObservable.prototype._subscribe = function (subscriber) {
-	        var value = this.value;
-	        var scheduler = this.scheduler;
-	        if (scheduler) {
-	            return scheduler.schedule(ScalarObservable.dispatch, 0, {
-	                done: false, value: value, subscriber: subscriber
-	            });
-	        }
-	        else {
-	            subscriber.next(value);
-	            if (!subscriber.isUnsubscribed) {
-	                subscriber.complete();
-	            }
-	        }
-	    };
-	    return ScalarObservable;
-	}(Observable_1.Observable));
-	exports.ScalarObservable = ScalarObservable;
-	//# sourceMappingURL=ScalarObservable.js.map
-
-/***/ },
-/* 384 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Observable_1 = __webpack_require__(62);
-	/**
-	 * We need this JSDoc comment for affecting ESDoc.
-	 * @extends {Ignored}
-	 * @hide true
-	 */
-	var EmptyObservable = (function (_super) {
-	    __extends(EmptyObservable, _super);
-	    function EmptyObservable(scheduler) {
-	        _super.call(this);
-	        this.scheduler = scheduler;
-	    }
-	    /**
-	     * Creates an Observable that emits no items to the Observer and immediately
-	     * emits a complete notification.
-	     *
-	     * <span class="informal">Just emits 'complete', and nothing else.
-	     * </span>
-	     *
-	     * <img src="./img/empty.png" width="100%">
-	     *
-	     * This static operator is useful for creating a simple Observable that only
-	     * emits the complete notification. It can be used for composing with other
-	     * Observables, such as in a {@link mergeMap}.
-	     *
-	     * @example <caption>Emit the number 7, then complete.</caption>
-	     * var result = Rx.Observable.empty().startWith(7);
-	     * result.subscribe(x => console.log(x));
-	     *
-	     * @example <caption>Map and flatten only odd numbers to the sequence 'a', 'b', 'c'</caption>
-	     * var interval = Rx.Observable.interval(1000);
-	     * var result = interval.mergeMap(x =>
-	     *   x % 2 === 1 ? Rx.Observable.of('a', 'b', 'c') : Rx.Observable.empty()
-	     * );
-	     * result.subscribe(x => console.log(x));
-	     *
-	     * @see {@link create}
-	     * @see {@link never}
-	     * @see {@link of}
-	     * @see {@link throw}
-	     *
-	     * @param {Scheduler} [scheduler] A {@link Scheduler} to use for scheduling
-	     * the emission of the complete notification.
-	     * @return {Observable} An "empty" Observable: emits only the complete
-	     * notification.
-	     * @static true
-	     * @name empty
-	     * @owner Observable
-	     */
-	    EmptyObservable.create = function (scheduler) {
-	        return new EmptyObservable(scheduler);
-	    };
-	    EmptyObservable.dispatch = function (arg) {
-	        var subscriber = arg.subscriber;
-	        subscriber.complete();
-	    };
-	    EmptyObservable.prototype._subscribe = function (subscriber) {
-	        var scheduler = this.scheduler;
-	        if (scheduler) {
-	            return scheduler.schedule(EmptyObservable.dispatch, 0, { subscriber: subscriber });
-	        }
-	        else {
-	            subscriber.complete();
-	        }
-	    };
-	    return EmptyObservable;
-	}(Observable_1.Observable));
-	exports.EmptyObservable = EmptyObservable;
-	//# sourceMappingURL=EmptyObservable.js.map
-
-/***/ },
-/* 385 */
-/***/ function(module, exports) {
-
-	"use strict";
-	function isScheduler(value) {
-	    return value && typeof value.schedule === 'function';
-	}
-	exports.isScheduler = isScheduler;
-	//# sourceMappingURL=isScheduler.js.map
-
-/***/ },
-/* 386 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var Observable_1 = __webpack_require__(62);
-	var catch_1 = __webpack_require__(387);
-	Observable_1.Observable.prototype.catch = catch_1._catch;
-	//# sourceMappingURL=catch.js.map
-
-/***/ },
-/* 387 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Subscriber_1 = __webpack_require__(67);
-	/**
-	 * Catches errors on the observable to be handled by returning a new observable or throwing an error.
-	 * @param {function} selector a function that takes as arguments `err`, which is the error, and `caught`, which
-	 *  is the source observable, in case you'd like to "retry" that observable by returning it again. Whatever observable
-	 *  is returned by the `selector` will be used to continue the observable chain.
-	 * @return {Observable} an observable that originates from either the source or the observable returned by the
-	 *  catch `selector` function.
-	 * @method catch
-	 * @owner Observable
-	 */
-	function _catch(selector) {
-	    var operator = new CatchOperator(selector);
-	    var caught = this.lift(operator);
-	    return (operator.caught = caught);
-	}
-	exports._catch = _catch;
-	var CatchOperator = (function () {
-	    function CatchOperator(selector) {
-	        this.selector = selector;
-	    }
-	    CatchOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new CatchSubscriber(subscriber, this.selector, this.caught));
-	    };
-	    return CatchOperator;
-	}());
-	/**
-	 * We need this JSDoc comment for affecting ESDoc.
-	 * @ignore
-	 * @extends {Ignored}
-	 */
-	var CatchSubscriber = (function (_super) {
-	    __extends(CatchSubscriber, _super);
-	    function CatchSubscriber(destination, selector, caught) {
-	        _super.call(this, destination);
-	        this.selector = selector;
-	        this.caught = caught;
-	    }
-	    // NOTE: overriding `error` instead of `_error` because we don't want
-	    // to have this flag this subscriber as `isStopped`.
-	    CatchSubscriber.prototype.error = function (err) {
-	        if (!this.isStopped) {
-	            var result = void 0;
-	            try {
-	                result = this.selector(err, this.caught);
-	            }
-	            catch (err) {
-	                this.destination.error(err);
-	                return;
-	            }
-	            this._innerSub(result);
-	        }
-	    };
-	    CatchSubscriber.prototype._innerSub = function (result) {
-	        this.unsubscribe();
-	        this.destination.remove(this);
-	        result.subscribe(this.destination);
-	    };
-	    return CatchSubscriber;
-	}(Subscriber_1.Subscriber));
-	//# sourceMappingURL=catch.js.map
-
-/***/ },
-/* 388 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var Observable_1 = __webpack_require__(62);
-	var do_1 = __webpack_require__(389);
-	Observable_1.Observable.prototype.do = do_1._do;
-	//# sourceMappingURL=do.js.map
-
-/***/ },
-/* 389 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Subscriber_1 = __webpack_require__(67);
-	/**
-	 * Perform a side effect for every emission on the source Observable, but return
-	 * an Observable that is identical to the source.
-	 *
-	 * <span class="informal">Intercepts each emission on the source and runs a
-	 * function, but returns an output which is identical to the source.</span>
-	 *
-	 * <img src="./img/do.png" width="100%">
-	 *
-	 * Returns a mirrored Observable of the source Observable, but modified so that
-	 * the provided Observer is called to perform a side effect for every value,
-	 * error, and completion emitted by the source. Any errors that are thrown in
-	 * the aforementioned Observer or handlers are safely sent down the error path
-	 * of the output Observable.
-	 *
-	 * This operator is useful for debugging your Observables for the correct values
-	 * or performing other side effects.
-	 *
-	 * Note: this is different to a `subscribe` on the Observable. If the Observable
-	 * returned by `do` is not subscribed, the side effects specified by the
-	 * Observer will never happen. `do` therefore simply spies on existing
-	 * execution, it does not trigger an execution to happen like `subscribe` does.
-	 *
-	 * @example <caption>Map every every click to the clientX position of that click, while also logging the click event</caption>
-	 * var clicks = Rx.Observable.fromEvent(document, 'click');
-	 * var positions = clicks
-	 *   .do(ev => console.log(ev))
-	 *   .map(ev => ev.clientX);
-	 * positions.subscribe(x => console.log(x));
-	 *
-	 * @see {@link map}
-	 * @see {@link subscribe}
-	 *
-	 * @param {Observer|function} [nextOrObserver] A normal Observer object or a
-	 * callback for `next`.
-	 * @param {function} [error] Callback for errors in the source.
-	 * @param {function} [complete] Callback for the completion of the source.
-	 * @return {Observable} An Observable identical to the source, but runs the
-	 * specified Observer or callback(s) for each item.
-	 * @method do
-	 * @name do
-	 * @owner Observable
-	 */
-	function _do(nextOrObserver, error, complete) {
-	    return this.lift(new DoOperator(nextOrObserver, error, complete));
-	}
-	exports._do = _do;
-	var DoOperator = (function () {
-	    function DoOperator(nextOrObserver, error, complete) {
-	        this.nextOrObserver = nextOrObserver;
-	        this.error = error;
-	        this.complete = complete;
-	    }
-	    DoOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new DoSubscriber(subscriber, this.nextOrObserver, this.error, this.complete));
-	    };
-	    return DoOperator;
-	}());
-	/**
-	 * We need this JSDoc comment for affecting ESDoc.
-	 * @ignore
-	 * @extends {Ignored}
-	 */
-	var DoSubscriber = (function (_super) {
-	    __extends(DoSubscriber, _super);
-	    function DoSubscriber(destination, nextOrObserver, error, complete) {
-	        _super.call(this, destination);
-	        var safeSubscriber = new Subscriber_1.Subscriber(nextOrObserver, error, complete);
-	        safeSubscriber.syncErrorThrowable = true;
-	        this.add(safeSubscriber);
-	        this.safeSubscriber = safeSubscriber;
-	    }
-	    DoSubscriber.prototype._next = function (value) {
-	        var safeSubscriber = this.safeSubscriber;
-	        safeSubscriber.next(value);
-	        if (safeSubscriber.syncErrorThrown) {
-	            this.destination.error(safeSubscriber.syncErrorValue);
-	        }
-	        else {
-	            this.destination.next(value);
-	        }
-	    };
-	    DoSubscriber.prototype._error = function (err) {
-	        var safeSubscriber = this.safeSubscriber;
-	        safeSubscriber.error(err);
-	        if (safeSubscriber.syncErrorThrown) {
-	            this.destination.error(safeSubscriber.syncErrorValue);
-	        }
-	        else {
-	            this.destination.error(err);
-	        }
-	    };
-	    DoSubscriber.prototype._complete = function () {
-	        var safeSubscriber = this.safeSubscriber;
-	        safeSubscriber.complete();
-	        if (safeSubscriber.syncErrorThrown) {
-	            this.destination.error(safeSubscriber.syncErrorValue);
-	        }
-	        else {
-	            this.destination.complete();
-	        }
-	    };
-	    return DoSubscriber;
-	}(Subscriber_1.Subscriber));
-	//# sourceMappingURL=do.js.map
-
-/***/ },
-/* 390 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var Observable_1 = __webpack_require__(62);
-	var map_1 = __webpack_require__(391);
+	var map_1 = __webpack_require__(381);
 	Observable_1.Observable.prototype.map = map_1.map;
 	//# sourceMappingURL=map.js.map
 
 /***/ },
-/* 391 */
+/* 381 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
