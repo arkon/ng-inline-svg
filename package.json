@@ -12,7 +12,9 @@
   },
   "files": [
     "src/*",
-    "dist/*"
+    "dist/*",
+    "README.md",
+    "LICENSE"
   ],
   "author": "Eugene Cheung",
   "license": "MIT",
