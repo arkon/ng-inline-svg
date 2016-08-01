@@ -7,8 +7,10 @@ export default class InlineSVG implements OnInit, OnChanges {
     cacheSVG: boolean;
     onSVGInserted: EventEmitter<SVGElement>;
     private inlineSVG;
+    private _absUrl;
     constructor(_el: ElementRef, _svgCache: SVGCache);
     ngOnInit(): void;
     ngOnChanges(changes: SimpleChanges): void;
     private _insertSVG();
+    private _getAbsoluteUrl(url);
 }

@@ -23,6 +23,8 @@ export default class InlineSVG implements OnInit, OnChanges {
 
   @Input() private inlineSVG: string;
 
+  private _absUrl: string;
+
   constructor(private _el: ElementRef, private _svgCache: SVGCache) {
   }
 
@@ -37,22 +39,41 @@ export default class InlineSVG implements OnInit, OnChanges {
   }
 
   private _insertSVG(): void {
+    // Check if a URL was actually passed into the directive
     if (!this.inlineSVG) {
       console.error('No URL passed to [inlineSVG]!');
       return;
     }
 
-    this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
-      .then((svg: SVGElement) => {
-        if (svg && this._el.nativeElement) {
-          if (this.replaceContents) {
-            this._el.nativeElement.innerHTML = '';
-          }
+    // Get absolute URL, and check if it's actually new
+    const absUrl = this._getAbsoluteUrl(this.inlineSVG);
 
-          this._el.nativeElement.appendChild(svg);
-          this.onSVGInserted.emit(svg);
-        }
-      })
-      .catch((err: any) => console.error(err));
+    if (absUrl !== this._absUrl) {
+      this._absUrl = absUrl;
+
+      // Fetch SVG via cache mechanism
+      this._svgCache.getSVG(this._absUrl, this.cacheSVG)
+        .subscribe(
+          (svg: SVGElement) => {
+            // Insert SVG
+            if (svg && this._el.nativeElement) {
+              if (this.replaceContents) {
+                this._el.nativeElement.innerHTML = '';
+              }
+
+              this._el.nativeElement.appendChild(svg);
+              this.onSVGInserted.emit(svg);
+            }
+          },
+          (err: any) => console.error(err)
+        );
+    }
+  }
+
+  private _getAbsoluteUrl(url: string): string {
+    const base = document.createElement('BASE') as HTMLBaseElement;
+    base.href = url;
+
+    return base.href;
   }
 }

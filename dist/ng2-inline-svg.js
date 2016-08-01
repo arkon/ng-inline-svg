@@ -32,17 +32,25 @@ var InlineSVG = (function () {
             console.error('No URL passed to [inlineSVG]!');
             return;
         }
-        this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
-            .then(function (svg) {
-            if (svg && _this._el.nativeElement) {
-                if (_this.replaceContents) {
-                    _this._el.nativeElement.innerHTML = '';
+        var absUrl = this._getAbsoluteUrl(this.inlineSVG);
+        if (absUrl !== this._absUrl) {
+            this._absUrl = absUrl;
+            this._svgCache.getSVG(this._absUrl, this.cacheSVG)
+                .subscribe(function (svg) {
+                if (svg && _this._el.nativeElement) {
+                    if (_this.replaceContents) {
+                        _this._el.nativeElement.innerHTML = '';
+                    }
+                    _this._el.nativeElement.appendChild(svg);
+                    _this.onSVGInserted.emit(svg);
                 }
-                _this._el.nativeElement.appendChild(svg);
-                _this.onSVGInserted.emit(svg);
-            }
-        })
-            .catch(function (err) { return console.error(err); });
+            }, function (err) { return console.error(err); });
+        }
+    };
+    InlineSVG.prototype._getAbsoluteUrl = function (url) {
+        var base = document.createElement('BASE');
+        base.href = url;
+        return base.href;
     };
     __decorate([
         core_1.Input(), 

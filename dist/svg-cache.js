@@ -10,38 +10,40 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var http_1 = require('@angular/http');
+var Observable_1 = require('rxjs/Observable');
+require('rxjs/add/observable/of');
+require('rxjs/add/operator/do');
+require('rxjs/add/operator/finally');
 require('rxjs/add/operator/map');
+require('rxjs/add/operator/share');
 var SVGCache = (function () {
     function SVGCache(_http) {
         this._http = _http;
         if (!SVGCache._cache) {
             SVGCache._cache = new Map();
         }
+        if (!SVGCache._inProgressFetches) {
+            SVGCache._inProgressFetches = new Map();
+        }
     }
     SVGCache.prototype.getSVG = function (url, cache) {
         var _this = this;
-        return new Promise(function (resolve, reject) {
-            var absUrl = _this._getAbsoluteUrl(url);
-            if (cache && SVGCache._cache.has(absUrl)) {
-                resolve(_this._cloneSvg(SVGCache._cache.get(absUrl)));
-            }
-            _this._http.get(absUrl)
-                .map(function (res) { return res.text(); })
-                .subscribe(function (svg) {
-                if (svg) {
-                    var svgElement = _this._svgElementFromString(svg);
-                    if (cache) {
-                        SVGCache._cache.set(absUrl, svgElement);
-                    }
-                    resolve(svgElement);
-                }
-            }, function (err) { return reject(err); });
-        });
-    };
-    SVGCache.prototype._getAbsoluteUrl = function (url) {
-        var base = document.createElement('BASE');
-        base.href = url;
-        return base.href;
+        if (cache && SVGCache._cache.has(url)) {
+            return Observable_1.Observable.of(this._cloneSvg(SVGCache._cache.get(url)));
+        }
+        if (SVGCache._inProgressFetches.has(url)) {
+            return SVGCache._inProgressFetches.get(url);
+        }
+        var req = this._http.get(url)
+            .map(function (res) { return res.text(); })
+            .finally(function () {
+            SVGCache._inProgressFetches.delete(url);
+        })
+            .share()
+            .do(function (svgText) { return SVGCache._cache.set(url, _this._svgElementFromString(svgText)); })
+            .map(function (svg) { return _this._cloneSvg(SVGCache._cache.get(url)); });
+        SVGCache._inProgressFetches.set(url, req);
+        return req;
     };
     SVGCache.prototype._svgElementFromString = function (str) {
         var div = document.createElement('DIV');
