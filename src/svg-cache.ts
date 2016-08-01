@@ -43,7 +43,7 @@ export default class SVGCache {
     });
   }
 
-  private _getAbsoluteUrl(url: string) {
+  private _getAbsoluteUrl(url: string): string {
     const base = document.createElement('BASE') as HTMLBaseElement;
     base.href = url;
 

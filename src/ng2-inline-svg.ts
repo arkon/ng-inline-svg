@@ -3,8 +3,10 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
-  Output
+  Output,
+  SimpleChanges
 } from '@angular/core';
 
 import SVGCache from './svg-cache';
@@ -13,8 +15,8 @@ import SVGCache from './svg-cache';
   selector: '[inlineSVG]',
   providers: [SVGCache]
 })
-export default class InlineSVG implements OnInit {
-  @Input() inlineSVG: string;
+export default class InlineSVG implements OnInit, OnChanges {
+  @Input() private inlineSVG: string;
   @Input() replaceContents: boolean = true;
   @Input() cacheSVG: boolean = true;
 
@@ -24,6 +26,16 @@ export default class InlineSVG implements OnInit {
   }
 
   ngOnInit() {
+    this._insertSVG();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['inlineSVG']) {
+      this._insertSVG();
+    }
+  }
+
+  private _insertSVG(): void {
     if (!this.inlineSVG) {
       console.error('No URL passed to [inlineSVG]!');
       return;
