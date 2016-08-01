@@ -62349,7 +62349,7 @@
 	        core_1.Component({
 	            selector: 'demo',
 	            directives: [ng2_inline_svg_1.default],
-	            template: "\n    <div class=\"demo-svg1\" aria-label=\"My icon\" [inlineSVG]=\"'img/image.svg'\"></div>\n    <div *ngIf=\"_showOther\" class=\"demo-svg2\" aria-label=\"Another icon\" [inlineSVG]=\"'img/image.svg'\"></div>\n  "
+	            template: "\n    <div class=\"demo-svg1\" aria-label=\"My icon 1\" [inlineSVG]=\"'img/image.svg'\"></div>\n    <div class=\"demo-svg2\" aria-label=\"My icon 2\" [inlineSVG]=\"'img/image.svg'\"></div>\n    <div *ngIf=\"_showOther\" class=\"demo-svg3\" aria-label=\"My delayed icon\" [inlineSVG]=\"'img/image.svg'\"></div>\n  "
 	        }), 
 	        __metadata('design:paramtypes', [])
 	    ], DemoComponent);
@@ -62383,27 +62383,39 @@
 	        this.onSVGInserted = new core_1.EventEmitter();
 	    }
 	    InlineSVG.prototype.ngOnInit = function () {
+	        this._insertSVG();
+	    };
+	    InlineSVG.prototype.ngOnChanges = function (changes) {
+	        if (changes['inlineSVG'] && changes['inlineSVG'].currentValue !== changes['inlineSVG'].previousValue) {
+	            this._insertSVG();
+	        }
+	    };
+	    InlineSVG.prototype._insertSVG = function () {
 	        var _this = this;
 	        if (!this.inlineSVG) {
 	            console.error('No URL passed to [inlineSVG]!');
 	            return;
 	        }
-	        this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
-	            .then(function (svg) {
-	            if (svg && _this._el.nativeElement) {
-	                if (_this.replaceContents) {
-	                    _this._el.nativeElement.innerHTML = '';
+	        var absUrl = this._getAbsoluteUrl(this.inlineSVG);
+	        if (absUrl !== this._absUrl) {
+	            this._absUrl = absUrl;
+	            this._svgCache.getSVG(this._absUrl, this.cacheSVG)
+	                .subscribe(function (svg) {
+	                if (svg && _this._el.nativeElement) {
+	                    if (_this.replaceContents) {
+	                        _this._el.nativeElement.innerHTML = '';
+	                    }
+	                    _this._el.nativeElement.appendChild(svg);
+	                    _this.onSVGInserted.emit(svg);
 	                }
-	                _this._el.nativeElement.appendChild(svg);
-	                _this.onSVGInserted.emit(svg);
-	            }
-	        })
-	            .catch(function (err) { return console.error(err); });
+	            }, function (err) { return console.error(err); });
+	        }
 	    };
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', String)
-	    ], InlineSVG.prototype, "inlineSVG", void 0);
+	    InlineSVG.prototype._getAbsoluteUrl = function (url) {
+	        var base = document.createElement('BASE');
+	        base.href = url;
+	        return base.href;
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Boolean)
@@ -62416,6 +62428,10 @@
 	        core_1.Output(), 
 	        __metadata('design:type', core_1.EventEmitter)
 	    ], InlineSVG.prototype, "onSVGInserted", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', String)
+	    ], InlineSVG.prototype, "inlineSVG", void 0);
 	    InlineSVG = __decorate([
 	        core_1.Directive({
 	            selector: '[inlineSVG]',
@@ -62445,38 +62461,43 @@
 	};
 	var core_1 = __webpack_require__(29);
 	var http_1 = __webpack_require__(356);
+	var Observable_1 = __webpack_require__(62);
 	__webpack_require__(380);
+	__webpack_require__(386);
+	__webpack_require__(388);
+	__webpack_require__(390);
+	__webpack_require__(392);
 	var SVGCache = (function () {
 	    function SVGCache(_http) {
 	        this._http = _http;
 	        if (!SVGCache._cache) {
 	            SVGCache._cache = new Map();
 	        }
+	        if (!SVGCache._inProgressReqs) {
+	            SVGCache._inProgressReqs = new Map();
+	        }
 	    }
 	    SVGCache.prototype.getSVG = function (url, cache) {
 	        var _this = this;
-	        return new Promise(function (resolve, reject) {
-	            var absUrl = _this._getAbsoluteUrl(url);
-	            if (cache && SVGCache._cache.has(absUrl)) {
-	                resolve(_this._cloneSvg(SVGCache._cache.get(absUrl)));
-	            }
-	            _this._http.get(absUrl)
-	                .map(function (res) { return res.text(); })
-	                .subscribe(function (svg) {
-	                if (svg) {
-	                    var svgElement = _this._svgElementFromString(svg);
-	                    if (cache) {
-	                        SVGCache._cache.set(absUrl, svgElement);
-	                    }
-	                    resolve(svgElement);
-	                }
-	            }, function (err) { return reject(err); });
+	        if (cache === void 0) { cache = true; }
+	        if (cache && SVGCache._cache.has(url)) {
+	            return Observable_1.Observable.of(this._cloneSVG(SVGCache._cache.get(url)));
+	        }
+	        if (SVGCache._inProgressReqs.has(url)) {
+	            return SVGCache._inProgressReqs.get(url);
+	        }
+	        var req = this._http.get(url)
+	            .map(function (res) { return res.text(); })
+	            .catch(function (err) { return err; })
+	            .finally(function () { return SVGCache._inProgressReqs.delete(url); })
+	            .share()
+	            .map(function (svgText) {
+	            var svgEl = _this._svgElementFromString(svgText);
+	            SVGCache._cache.set(url, svgEl);
+	            return _this._cloneSVG(svgEl);
 	        });
-	    };
-	    SVGCache.prototype._getAbsoluteUrl = function (url) {
-	        var base = document.createElement('BASE');
-	        base.href = url;
-	        return base.href;
+	        SVGCache._inProgressReqs.set(url, req);
+	        return req;
 	    };
 	    SVGCache.prototype._svgElementFromString = function (str) {
 	        var div = document.createElement('DIV');
@@ -62487,7 +62508,7 @@
 	        }
 	        return svg;
 	    };
-	    SVGCache.prototype._cloneSvg = function (svg) {
+	    SVGCache.prototype._cloneSVG = function (svg) {
 	        return svg.cloneNode(true);
 	    };
 	    SVGCache = __decorate([
@@ -62506,12 +62527,449 @@
 
 	"use strict";
 	var Observable_1 = __webpack_require__(62);
-	var map_1 = __webpack_require__(381);
+	var of_1 = __webpack_require__(381);
+	Observable_1.Observable.of = of_1.of;
+	//# sourceMappingURL=of.js.map
+
+/***/ },
+/* 381 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var ArrayObservable_1 = __webpack_require__(382);
+	exports.of = ArrayObservable_1.ArrayObservable.of;
+	//# sourceMappingURL=of.js.map
+
+/***/ },
+/* 382 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Observable_1 = __webpack_require__(62);
+	var ScalarObservable_1 = __webpack_require__(383);
+	var EmptyObservable_1 = __webpack_require__(384);
+	var isScheduler_1 = __webpack_require__(385);
+	/**
+	 * We need this JSDoc comment for affecting ESDoc.
+	 * @extends {Ignored}
+	 * @hide true
+	 */
+	var ArrayObservable = (function (_super) {
+	    __extends(ArrayObservable, _super);
+	    function ArrayObservable(array, scheduler) {
+	        _super.call(this);
+	        this.array = array;
+	        this.scheduler = scheduler;
+	        if (!scheduler && array.length === 1) {
+	            this._isScalar = true;
+	            this.value = array[0];
+	        }
+	    }
+	    ArrayObservable.create = function (array, scheduler) {
+	        return new ArrayObservable(array, scheduler);
+	    };
+	    /**
+	     * Creates an Observable that emits some values you specify as arguments,
+	     * immediately one after the other, and then emits a complete notification.
+	     *
+	     * <span class="informal">Emits the arguments you provide, then completes.
+	     * </span>
+	     *
+	     * <img src="./img/of.png" width="100%">
+	     *
+	     * This static operator is useful for creating a simple Observable that only
+	     * emits the arguments given, and the complete notification thereafter. It can
+	     * be used for composing with other Observables, such as with {@link concat}.
+	     * By default, it uses a `null` Scheduler, which means the `next`
+	     * notifications are sent synchronously, although with a different Scheduler
+	     * it is possible to determine when those notifications will be delivered.
+	     *
+	     * @example <caption>Emit 10, 20, 30, then 'a', 'b', 'c', then start ticking every second.</caption>
+	     * var numbers = Rx.Observable.of(10, 20, 30);
+	     * var letters = Rx.Observable.of('a', 'b', 'c');
+	     * var interval = Rx.Observable.interval(1000);
+	     * var result = numbers.concat(letters).concat(interval);
+	     * result.subscribe(x => console.log(x));
+	     *
+	     * @see {@link create}
+	     * @see {@link empty}
+	     * @see {@link never}
+	     * @see {@link throw}
+	     *
+	     * @param {...T} values Arguments that represent `next` values to be emitted.
+	     * @param {Scheduler} [scheduler] A {@link Scheduler} to use for scheduling
+	     * the emissions of the `next` notifications.
+	     * @return {Observable<T>} An Observable that emits each given input value.
+	     * @static true
+	     * @name of
+	     * @owner Observable
+	     */
+	    ArrayObservable.of = function () {
+	        var array = [];
+	        for (var _i = 0; _i < arguments.length; _i++) {
+	            array[_i - 0] = arguments[_i];
+	        }
+	        var scheduler = array[array.length - 1];
+	        if (isScheduler_1.isScheduler(scheduler)) {
+	            array.pop();
+	        }
+	        else {
+	            scheduler = null;
+	        }
+	        var len = array.length;
+	        if (len > 1) {
+	            return new ArrayObservable(array, scheduler);
+	        }
+	        else if (len === 1) {
+	            return new ScalarObservable_1.ScalarObservable(array[0], scheduler);
+	        }
+	        else {
+	            return new EmptyObservable_1.EmptyObservable(scheduler);
+	        }
+	    };
+	    ArrayObservable.dispatch = function (state) {
+	        var array = state.array, index = state.index, count = state.count, subscriber = state.subscriber;
+	        if (index >= count) {
+	            subscriber.complete();
+	            return;
+	        }
+	        subscriber.next(array[index]);
+	        if (subscriber.isUnsubscribed) {
+	            return;
+	        }
+	        state.index = index + 1;
+	        this.schedule(state);
+	    };
+	    ArrayObservable.prototype._subscribe = function (subscriber) {
+	        var index = 0;
+	        var array = this.array;
+	        var count = array.length;
+	        var scheduler = this.scheduler;
+	        if (scheduler) {
+	            return scheduler.schedule(ArrayObservable.dispatch, 0, {
+	                array: array, index: index, count: count, subscriber: subscriber
+	            });
+	        }
+	        else {
+	            for (var i = 0; i < count && !subscriber.isUnsubscribed; i++) {
+	                subscriber.next(array[i]);
+	            }
+	            subscriber.complete();
+	        }
+	    };
+	    return ArrayObservable;
+	}(Observable_1.Observable));
+	exports.ArrayObservable = ArrayObservable;
+	//# sourceMappingURL=ArrayObservable.js.map
+
+/***/ },
+/* 383 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Observable_1 = __webpack_require__(62);
+	/**
+	 * We need this JSDoc comment for affecting ESDoc.
+	 * @extends {Ignored}
+	 * @hide true
+	 */
+	var ScalarObservable = (function (_super) {
+	    __extends(ScalarObservable, _super);
+	    function ScalarObservable(value, scheduler) {
+	        _super.call(this);
+	        this.value = value;
+	        this.scheduler = scheduler;
+	        this._isScalar = true;
+	    }
+	    ScalarObservable.create = function (value, scheduler) {
+	        return new ScalarObservable(value, scheduler);
+	    };
+	    ScalarObservable.dispatch = function (state) {
+	        var done = state.done, value = state.value, subscriber = state.subscriber;
+	        if (done) {
+	            subscriber.complete();
+	            return;
+	        }
+	        subscriber.next(value);
+	        if (subscriber.isUnsubscribed) {
+	            return;
+	        }
+	        state.done = true;
+	        this.schedule(state);
+	    };
+	    ScalarObservable.prototype._subscribe = function (subscriber) {
+	        var value = this.value;
+	        var scheduler = this.scheduler;
+	        if (scheduler) {
+	            return scheduler.schedule(ScalarObservable.dispatch, 0, {
+	                done: false, value: value, subscriber: subscriber
+	            });
+	        }
+	        else {
+	            subscriber.next(value);
+	            if (!subscriber.isUnsubscribed) {
+	                subscriber.complete();
+	            }
+	        }
+	    };
+	    return ScalarObservable;
+	}(Observable_1.Observable));
+	exports.ScalarObservable = ScalarObservable;
+	//# sourceMappingURL=ScalarObservable.js.map
+
+/***/ },
+/* 384 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Observable_1 = __webpack_require__(62);
+	/**
+	 * We need this JSDoc comment for affecting ESDoc.
+	 * @extends {Ignored}
+	 * @hide true
+	 */
+	var EmptyObservable = (function (_super) {
+	    __extends(EmptyObservable, _super);
+	    function EmptyObservable(scheduler) {
+	        _super.call(this);
+	        this.scheduler = scheduler;
+	    }
+	    /**
+	     * Creates an Observable that emits no items to the Observer and immediately
+	     * emits a complete notification.
+	     *
+	     * <span class="informal">Just emits 'complete', and nothing else.
+	     * </span>
+	     *
+	     * <img src="./img/empty.png" width="100%">
+	     *
+	     * This static operator is useful for creating a simple Observable that only
+	     * emits the complete notification. It can be used for composing with other
+	     * Observables, such as in a {@link mergeMap}.
+	     *
+	     * @example <caption>Emit the number 7, then complete.</caption>
+	     * var result = Rx.Observable.empty().startWith(7);
+	     * result.subscribe(x => console.log(x));
+	     *
+	     * @example <caption>Map and flatten only odd numbers to the sequence 'a', 'b', 'c'</caption>
+	     * var interval = Rx.Observable.interval(1000);
+	     * var result = interval.mergeMap(x =>
+	     *   x % 2 === 1 ? Rx.Observable.of('a', 'b', 'c') : Rx.Observable.empty()
+	     * );
+	     * result.subscribe(x => console.log(x));
+	     *
+	     * @see {@link create}
+	     * @see {@link never}
+	     * @see {@link of}
+	     * @see {@link throw}
+	     *
+	     * @param {Scheduler} [scheduler] A {@link Scheduler} to use for scheduling
+	     * the emission of the complete notification.
+	     * @return {Observable} An "empty" Observable: emits only the complete
+	     * notification.
+	     * @static true
+	     * @name empty
+	     * @owner Observable
+	     */
+	    EmptyObservable.create = function (scheduler) {
+	        return new EmptyObservable(scheduler);
+	    };
+	    EmptyObservable.dispatch = function (arg) {
+	        var subscriber = arg.subscriber;
+	        subscriber.complete();
+	    };
+	    EmptyObservable.prototype._subscribe = function (subscriber) {
+	        var scheduler = this.scheduler;
+	        if (scheduler) {
+	            return scheduler.schedule(EmptyObservable.dispatch, 0, { subscriber: subscriber });
+	        }
+	        else {
+	            subscriber.complete();
+	        }
+	    };
+	    return EmptyObservable;
+	}(Observable_1.Observable));
+	exports.EmptyObservable = EmptyObservable;
+	//# sourceMappingURL=EmptyObservable.js.map
+
+/***/ },
+/* 385 */
+/***/ function(module, exports) {
+
+	"use strict";
+	function isScheduler(value) {
+	    return value && typeof value.schedule === 'function';
+	}
+	exports.isScheduler = isScheduler;
+	//# sourceMappingURL=isScheduler.js.map
+
+/***/ },
+/* 386 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var Observable_1 = __webpack_require__(62);
+	var catch_1 = __webpack_require__(387);
+	Observable_1.Observable.prototype.catch = catch_1._catch;
+	//# sourceMappingURL=catch.js.map
+
+/***/ },
+/* 387 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Subscriber_1 = __webpack_require__(67);
+	/**
+	 * Catches errors on the observable to be handled by returning a new observable or throwing an error.
+	 * @param {function} selector a function that takes as arguments `err`, which is the error, and `caught`, which
+	 *  is the source observable, in case you'd like to "retry" that observable by returning it again. Whatever observable
+	 *  is returned by the `selector` will be used to continue the observable chain.
+	 * @return {Observable} an observable that originates from either the source or the observable returned by the
+	 *  catch `selector` function.
+	 * @method catch
+	 * @owner Observable
+	 */
+	function _catch(selector) {
+	    var operator = new CatchOperator(selector);
+	    var caught = this.lift(operator);
+	    return (operator.caught = caught);
+	}
+	exports._catch = _catch;
+	var CatchOperator = (function () {
+	    function CatchOperator(selector) {
+	        this.selector = selector;
+	    }
+	    CatchOperator.prototype.call = function (subscriber, source) {
+	        return source._subscribe(new CatchSubscriber(subscriber, this.selector, this.caught));
+	    };
+	    return CatchOperator;
+	}());
+	/**
+	 * We need this JSDoc comment for affecting ESDoc.
+	 * @ignore
+	 * @extends {Ignored}
+	 */
+	var CatchSubscriber = (function (_super) {
+	    __extends(CatchSubscriber, _super);
+	    function CatchSubscriber(destination, selector, caught) {
+	        _super.call(this, destination);
+	        this.selector = selector;
+	        this.caught = caught;
+	    }
+	    // NOTE: overriding `error` instead of `_error` because we don't want
+	    // to have this flag this subscriber as `isStopped`.
+	    CatchSubscriber.prototype.error = function (err) {
+	        if (!this.isStopped) {
+	            var result = void 0;
+	            try {
+	                result = this.selector(err, this.caught);
+	            }
+	            catch (err) {
+	                this.destination.error(err);
+	                return;
+	            }
+	            this._innerSub(result);
+	        }
+	    };
+	    CatchSubscriber.prototype._innerSub = function (result) {
+	        this.unsubscribe();
+	        this.destination.remove(this);
+	        result.subscribe(this.destination);
+	    };
+	    return CatchSubscriber;
+	}(Subscriber_1.Subscriber));
+	//# sourceMappingURL=catch.js.map
+
+/***/ },
+/* 388 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var Observable_1 = __webpack_require__(62);
+	var finally_1 = __webpack_require__(389);
+	Observable_1.Observable.prototype.finally = finally_1._finally;
+	//# sourceMappingURL=finally.js.map
+
+/***/ },
+/* 389 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Subscriber_1 = __webpack_require__(67);
+	var Subscription_1 = __webpack_require__(69);
+	/**
+	 * Returns an Observable that mirrors the source Observable, but will call a specified function when
+	 * the source terminates on complete or error.
+	 * @param {function} finallySelector function to be called when source terminates.
+	 * @return {Observable} an Observable that mirrors the source, but will call the specified function on termination.
+	 * @method finally
+	 * @owner Observable
+	 */
+	function _finally(finallySelector) {
+	    return this.lift(new FinallyOperator(finallySelector));
+	}
+	exports._finally = _finally;
+	var FinallyOperator = (function () {
+	    function FinallyOperator(finallySelector) {
+	        this.finallySelector = finallySelector;
+	    }
+	    FinallyOperator.prototype.call = function (subscriber, source) {
+	        return source._subscribe(new FinallySubscriber(subscriber, this.finallySelector));
+	    };
+	    return FinallyOperator;
+	}());
+	/**
+	 * We need this JSDoc comment for affecting ESDoc.
+	 * @ignore
+	 * @extends {Ignored}
+	 */
+	var FinallySubscriber = (function (_super) {
+	    __extends(FinallySubscriber, _super);
+	    function FinallySubscriber(destination, finallySelector) {
+	        _super.call(this, destination);
+	        this.add(new Subscription_1.Subscription(finallySelector));
+	    }
+	    return FinallySubscriber;
+	}(Subscriber_1.Subscriber));
+	//# sourceMappingURL=finally.js.map
+
+/***/ },
+/* 390 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var Observable_1 = __webpack_require__(62);
+	var map_1 = __webpack_require__(391);
 	Observable_1.Observable.prototype.map = map_1.map;
 	//# sourceMappingURL=map.js.map
 
 /***/ },
-/* 381 */
+/* 391 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -62600,6 +63058,235 @@
 	    return MapSubscriber;
 	}(Subscriber_1.Subscriber));
 	//# sourceMappingURL=map.js.map
+
+/***/ },
+/* 392 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var Observable_1 = __webpack_require__(62);
+	var share_1 = __webpack_require__(393);
+	Observable_1.Observable.prototype.share = share_1.share;
+	//# sourceMappingURL=share.js.map
+
+/***/ },
+/* 393 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var multicast_1 = __webpack_require__(394);
+	var Subject_1 = __webpack_require__(61);
+	function shareSubjectFactory() {
+	    return new Subject_1.Subject();
+	}
+	/**
+	 * Returns a new Observable that multicasts (shares) the original Observable. As long as there is at least one
+	 * Subscriber this Observable will be subscribed and emitting data. When all subscribers have unsubscribed it will
+	 * unsubscribe from the source Observable. Because the Observable is multicasting it makes the stream `hot`.
+	 * This is an alias for .publish().refCount().
+	 *
+	 * <img src="./img/share.png" width="100%">
+	 *
+	 * @return {Observable<T>} an Observable that upon connection causes the source Observable to emit items to its Observers
+	 * @method share
+	 * @owner Observable
+	 */
+	function share() {
+	    return multicast_1.multicast.call(this, shareSubjectFactory).refCount();
+	}
+	exports.share = share;
+	;
+	//# sourceMappingURL=share.js.map
+
+/***/ },
+/* 394 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var ConnectableObservable_1 = __webpack_require__(395);
+	/**
+	 * Returns an Observable that emits the results of invoking a specified selector on items
+	 * emitted by a ConnectableObservable that shares a single subscription to the underlying stream.
+	 *
+	 * <img src="./img/multicast.png" width="100%">
+	 *
+	 * @param {Function} selector - a function that can use the multicasted source stream
+	 * as many times as needed, without causing multiple subscriptions to the source stream.
+	 * Subscribers to the given source will receive all notifications of the source from the
+	 * time of the subscription forward.
+	 * @return {Observable} an Observable that emits the results of invoking the selector
+	 * on the items emitted by a `ConnectableObservable` that shares a single subscription to
+	 * the underlying stream.
+	 * @method multicast
+	 * @owner Observable
+	 */
+	function multicast(subjectOrSubjectFactory) {
+	    var subjectFactory;
+	    if (typeof subjectOrSubjectFactory === 'function') {
+	        subjectFactory = subjectOrSubjectFactory;
+	    }
+	    else {
+	        subjectFactory = function subjectFactory() {
+	            return subjectOrSubjectFactory;
+	        };
+	    }
+	    return new ConnectableObservable_1.ConnectableObservable(this, subjectFactory);
+	}
+	exports.multicast = multicast;
+	//# sourceMappingURL=multicast.js.map
+
+/***/ },
+/* 395 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Observable_1 = __webpack_require__(62);
+	var Subscriber_1 = __webpack_require__(67);
+	var Subscription_1 = __webpack_require__(69);
+	/**
+	 * @class ConnectableObservable<T>
+	 */
+	var ConnectableObservable = (function (_super) {
+	    __extends(ConnectableObservable, _super);
+	    function ConnectableObservable(source, subjectFactory) {
+	        _super.call(this);
+	        this.source = source;
+	        this.subjectFactory = subjectFactory;
+	    }
+	    ConnectableObservable.prototype._subscribe = function (subscriber) {
+	        return this.getSubject().subscribe(subscriber);
+	    };
+	    ConnectableObservable.prototype.getSubject = function () {
+	        var subject = this.subject;
+	        if (subject && !subject.isUnsubscribed) {
+	            return subject;
+	        }
+	        return (this.subject = this.subjectFactory());
+	    };
+	    ConnectableObservable.prototype.connect = function () {
+	        var source = this.source;
+	        var subscription = this.subscription;
+	        if (subscription && !subscription.isUnsubscribed) {
+	            return subscription;
+	        }
+	        subscription = source.subscribe(this.getSubject());
+	        subscription.add(new ConnectableSubscription(this));
+	        return (this.subscription = subscription);
+	    };
+	    ConnectableObservable.prototype.refCount = function () {
+	        return new RefCountObservable(this);
+	    };
+	    /**
+	     * This method is opened for `ConnectableSubscription`.
+	     * Not to call from others.
+	     */
+	    ConnectableObservable.prototype._closeSubscription = function () {
+	        this.subject = null;
+	        this.subscription = null;
+	    };
+	    return ConnectableObservable;
+	}(Observable_1.Observable));
+	exports.ConnectableObservable = ConnectableObservable;
+	/**
+	 * We need this JSDoc comment for affecting ESDoc.
+	 * @ignore
+	 * @extends {Ignored}
+	 */
+	var ConnectableSubscription = (function (_super) {
+	    __extends(ConnectableSubscription, _super);
+	    function ConnectableSubscription(connectable) {
+	        _super.call(this);
+	        this.connectable = connectable;
+	    }
+	    ConnectableSubscription.prototype._unsubscribe = function () {
+	        var connectable = this.connectable;
+	        connectable._closeSubscription();
+	        this.connectable = null;
+	    };
+	    return ConnectableSubscription;
+	}(Subscription_1.Subscription));
+	/**
+	 * We need this JSDoc comment for affecting ESDoc.
+	 * @ignore
+	 * @extends {Ignored}
+	 */
+	var RefCountObservable = (function (_super) {
+	    __extends(RefCountObservable, _super);
+	    function RefCountObservable(connectable, refCount) {
+	        if (refCount === void 0) { refCount = 0; }
+	        _super.call(this);
+	        this.connectable = connectable;
+	        this.refCount = refCount;
+	    }
+	    RefCountObservable.prototype._subscribe = function (subscriber) {
+	        var connectable = this.connectable;
+	        var refCountSubscriber = new RefCountSubscriber(subscriber, this);
+	        var subscription = connectable.subscribe(refCountSubscriber);
+	        if (!subscription.isUnsubscribed && ++this.refCount === 1) {
+	            refCountSubscriber.connection = this.connection = connectable.connect();
+	        }
+	        return subscription;
+	    };
+	    return RefCountObservable;
+	}(Observable_1.Observable));
+	/**
+	 * We need this JSDoc comment for affecting ESDoc.
+	 * @ignore
+	 * @extends {Ignored}
+	 */
+	var RefCountSubscriber = (function (_super) {
+	    __extends(RefCountSubscriber, _super);
+	    function RefCountSubscriber(destination, refCountObservable) {
+	        _super.call(this, null);
+	        this.destination = destination;
+	        this.refCountObservable = refCountObservable;
+	        this.connection = refCountObservable.connection;
+	        destination.add(this);
+	    }
+	    RefCountSubscriber.prototype._next = function (value) {
+	        this.destination.next(value);
+	    };
+	    RefCountSubscriber.prototype._error = function (err) {
+	        this._resetConnectable();
+	        this.destination.error(err);
+	    };
+	    RefCountSubscriber.prototype._complete = function () {
+	        this._resetConnectable();
+	        this.destination.complete();
+	    };
+	    RefCountSubscriber.prototype._resetConnectable = function () {
+	        var observable = this.refCountObservable;
+	        var obsConnection = observable.connection;
+	        var subConnection = this.connection;
+	        if (subConnection && subConnection === obsConnection) {
+	            observable.refCount = 0;
+	            obsConnection.unsubscribe();
+	            observable.connection = null;
+	            this.unsubscribe();
+	        }
+	    };
+	    RefCountSubscriber.prototype._unsubscribe = function () {
+	        var observable = this.refCountObservable;
+	        if (observable.refCount === 0) {
+	            return;
+	        }
+	        if (--observable.refCount === 0) {
+	            var obsConnection = observable.connection;
+	            var subConnection = this.connection;
+	            if (subConnection && subConnection === obsConnection) {
+	                obsConnection.unsubscribe();
+	                observable.connection = null;
+	            }
+	        }
+	    };
+	    return RefCountSubscriber;
+	}(Subscriber_1.Subscriber));
+	//# sourceMappingURL=ConnectableObservable.js.map
 
 /***/ }
 /******/ ]);
