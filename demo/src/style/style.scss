@@ -35,3 +35,19 @@ a {
     border-left: 1px solid $dark-grey;
   }
 }
+
+svg {
+  fill: currentColor;
+}
+
+.demo-svg1 {
+  color: orangered;
+}
+
+.demo-svg2 {
+  color: mediumseagreen;
+}
+
+.demo-svg3 {
+  color: dodgerblue;
+}

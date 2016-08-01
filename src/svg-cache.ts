@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/finally';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
@@ -10,40 +10,42 @@ import 'rxjs/add/operator/share';
 @Injectable()
 export default class SVGCache {
   private static _cache: Map<string, SVGElement>;
-  private static _inProgressFetches: Map<string, Observable<SVGElement>>;
+  private static _inProgressReqs: Map<string, Observable<SVGElement>>;
 
   constructor(private _http: Http) {
     if (!SVGCache._cache) {
       SVGCache._cache = new Map<string, SVGElement>();
     }
 
-    if (!SVGCache._inProgressFetches) {
-      SVGCache._inProgressFetches = new Map<string, Observable<SVGElement>>();
+    if (!SVGCache._inProgressReqs) {
+      SVGCache._inProgressReqs = new Map<string, Observable<SVGElement>>();
     }
   }
 
-  getSVG(url: string, cache: boolean): Observable<SVGElement> {
+  getSVG(url: string, cache: boolean = true): Observable<SVGElement> {
     // Return cached copy if it exists
     if (cache && SVGCache._cache.has(url)) {
-      return Observable.of(this._cloneSvg(SVGCache._cache.get(url)));
+      return Observable.of(this._cloneSVG(SVGCache._cache.get(url)));
     }
 
     // Return existing fetch observable
-    if (SVGCache._inProgressFetches.has(url)) {
-      return SVGCache._inProgressFetches.get(url);
+    if (SVGCache._inProgressReqs.has(url)) {
+      return SVGCache._inProgressReqs.get(url);
     }
 
     // Otherwise, make the HTTP call to fetch
     const req = this._http.get(url)
       .map((res: Response) => res.text())
-      .finally(() => {
-        SVGCache._inProgressFetches.delete(url);
-      })
+      .catch((err: any) => err)
+      .finally(() => SVGCache._inProgressReqs.delete(url))
       .share()
-      .do((svgText: string) => SVGCache._cache.set(url, this._svgElementFromString(svgText)))
-      .map((svg: string) => this._cloneSvg(SVGCache._cache.get(url)));
+      .map((svgText: string) => {
+        const svgEl = this._svgElementFromString(svgText);
+        SVGCache._cache.set(url, svgEl);
+        return this._cloneSVG(svgEl);
+      });
 
-    SVGCache._inProgressFetches.set(url, req);
+    SVGCache._inProgressReqs.set(url, req);
 
     return req;
   }
@@ -61,7 +63,7 @@ export default class SVGCache {
     return svg;
   }
 
-  private _cloneSvg(svg: SVGElement): SVGElement {
+  private _cloneSVG(svg: SVGElement): SVGElement {
     return svg.cloneNode(true) as SVGElement;
   }
 }
