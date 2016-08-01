@@ -19,6 +19,14 @@ var InlineSVG = (function () {
         this.onSVGInserted = new core_1.EventEmitter();
     }
     InlineSVG.prototype.ngOnInit = function () {
+        this._insertSVG();
+    };
+    InlineSVG.prototype.ngOnChanges = function (changes) {
+        if (changes['inlineSVG'] && changes['inlineSVG'].currentValue !== changes['inlineSVG'].previousValue) {
+            this._insertSVG();
+        }
+    };
+    InlineSVG.prototype._insertSVG = function () {
         var _this = this;
         if (!this.inlineSVG) {
             console.error('No URL passed to [inlineSVG]!');
@@ -38,10 +46,6 @@ var InlineSVG = (function () {
     };
     __decorate([
         core_1.Input(), 
-        __metadata('design:type', String)
-    ], InlineSVG.prototype, "inlineSVG", void 0);
-    __decorate([
-        core_1.Input(), 
         __metadata('design:type', Boolean)
     ], InlineSVG.prototype, "replaceContents", void 0);
     __decorate([
@@ -52,6 +56,10 @@ var InlineSVG = (function () {
         core_1.Output(), 
         __metadata('design:type', core_1.EventEmitter)
     ], InlineSVG.prototype, "onSVGInserted", void 0);
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', String)
+    ], InlineSVG.prototype, "inlineSVG", void 0);
     InlineSVG = __decorate([
         core_1.Directive({
             selector: '[inlineSVG]',

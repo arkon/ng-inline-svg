@@ -16,21 +16,22 @@ import SVGCache from './svg-cache';
   providers: [SVGCache]
 })
 export default class InlineSVG implements OnInit, OnChanges {
-  @Input() private inlineSVG: string;
   @Input() replaceContents: boolean = true;
   @Input() cacheSVG: boolean = true;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
 
+  @Input() private inlineSVG: string;
+
   constructor(private _el: ElementRef, private _svgCache: SVGCache) {
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this._insertSVG();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['inlineSVG']) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['inlineSVG'] && changes['inlineSVG'].currentValue !== changes['inlineSVG'].previousValue) {
       this._insertSVG();
     }
   }
