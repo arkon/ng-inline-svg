@@ -8,10 +8,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var core_1 = require('@angular/core');
+var platform_browser_1 = require('@angular/platform-browser');
 var svg_cache_1 = require('./svg-cache');
 var InlineSVG = (function () {
-    function InlineSVG(_el, _svgCache) {
+    function InlineSVG(_document, _el, _svgCache) {
+        this._document = _document;
         this._el = _el;
         this._svgCache = _svgCache;
         this.replaceContents = true;
@@ -22,7 +27,8 @@ var InlineSVG = (function () {
         this._insertSVG();
     };
     InlineSVG.prototype.ngOnChanges = function (changes) {
-        if (changes['inlineSVG'] && changes['inlineSVG'].currentValue !== changes['inlineSVG'].previousValue) {
+        if (changes['inlineSVG'] &&
+            changes['inlineSVG'].currentValue !== changes['inlineSVG'].previousValue) {
             this._insertSVG();
         }
     };
@@ -44,11 +50,13 @@ var InlineSVG = (function () {
                     _this._el.nativeElement.appendChild(svg);
                     _this.onSVGInserted.emit(svg);
                 }
-            }, function (err) { return console.error(err); });
+            }, function (err) {
+                console.error(err);
+            });
         }
     };
     InlineSVG.prototype._getAbsoluteUrl = function (url) {
-        var base = document.createElement('BASE');
+        var base = this._document.createElement('BASE');
         base.href = url;
         return base.href;
     };
@@ -72,8 +80,9 @@ var InlineSVG = (function () {
         core_1.Directive({
             selector: '[inlineSVG]',
             providers: [svg_cache_1.default]
-        }), 
-        __metadata('design:paramtypes', [core_1.ElementRef, svg_cache_1.default])
+        }),
+        __param(0, core_1.Inject(platform_browser_1.DOCUMENT)), 
+        __metadata('design:paramtypes', [HTMLDocument, core_1.ElementRef, svg_cache_1.default])
     ], InlineSVG);
     return InlineSVG;
 }());

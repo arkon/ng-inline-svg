@@ -2,12 +2,14 @@ import {
   Directive,
   ElementRef,
   EventEmitter,
+  Inject,
   Input,
   OnChanges,
   OnInit,
   Output,
   SimpleChanges
 } from '@angular/core';
+import { DOCUMENT } from '@angular/platform-browser';
 
 import SVGCache from './svg-cache';
 
@@ -25,7 +27,10 @@ export default class InlineSVG implements OnInit, OnChanges {
 
   private _absUrl: string;
 
-  constructor(private _el: ElementRef, private _svgCache: SVGCache) {
+  constructor(
+    @Inject(DOCUMENT) private _document: HTMLDocument,
+    private _el: ElementRef,
+    private _svgCache: SVGCache) {
   }
 
   ngOnInit(): void {
@@ -33,7 +38,8 @@ export default class InlineSVG implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['inlineSVG'] && changes['inlineSVG'].currentValue !== changes['inlineSVG'].previousValue) {
+    if (changes['inlineSVG'] &&
+      changes['inlineSVG'].currentValue !== changes['inlineSVG'].previousValue) {
       this._insertSVG();
     }
   }
@@ -65,13 +71,15 @@ export default class InlineSVG implements OnInit, OnChanges {
               this.onSVGInserted.emit(svg);
             }
           },
-          (err: any) => console.error(err)
+          (err: any) => {
+            console.error(err);
+          }
         );
     }
   }
 
   private _getAbsoluteUrl(url: string): string {
-    const base = document.createElement('BASE') as HTMLBaseElement;
+    const base = this._document.createElement('BASE') as HTMLBaseElement;
     base.href = url;
 
     return base.href;

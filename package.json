@@ -35,7 +35,8 @@
   },
   "peerDependencies": {
     "@angular/core": "^2.0.0-rc.4",
-    "@angular/http": "^2.0.0-rc.4"
+    "@angular/http": "^2.0.0-rc.4",
+    "@angular/platform-browser": "^2.0.0-rc.4"
   },
   "devDependencies": {
     "@angular/common": "^2.0.0-rc.4",
