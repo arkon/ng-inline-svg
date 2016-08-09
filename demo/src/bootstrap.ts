@@ -1,9 +1,18 @@
-import { enableProdMode } from '@angular/core';
-import { bootstrap } from '@angular/platform-browser-dynamic';
+import { NgModule, enableProdMode } from '@angular/core';
 import { HTTP_PROVIDERS } from '@angular/http';
+import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { DemoComponent } from './demo/demo.component';
 
 enableProdMode();
 
-bootstrap(DemoComponent, [HTTP_PROVIDERS]);
+@NgModule({
+  declarations: [DemoComponent],
+  imports: [BrowserModule],
+  providers: [HTTP_PROVIDERS],
+  bootstrap: [DemoComponent],
+})
+class DemoAppModule {}
+
+platformBrowserDynamic().bootstrapModule(DemoAppModule);
