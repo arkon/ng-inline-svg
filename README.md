@@ -21,18 +21,21 @@ npm install --save ng2-inline-svg
 
 ## Usage
 
-Make sure to add `HTTP_PROVIDERS` to your list of bootstrap providers:
+If you'd like to use a module, add `InlineSVGModule` to your list of app module imports:
 
 ```typescript
-import { bootstrap } from '@angular/platform-browser-dynamic';
-import { HTTP_PROVIDERS } from '@angular/http';
+import { InlineSVGModule } from 'ng2-inline-svg';
 
-import { AppComponent } from './app/app.component';
-
-bootstrap(App, [HTTP_PROVIDERS]);
+@NgModule({
+  declarations: [AppComponent],
+  imports: [BrowserModule, InlineSVGModule],
+  bootstrap: [AppComponent]
+})
+class AppModule {}
 ```
 
-Import the component and add it to the list of directives on your component:
+Alternatively, you can directly add the directive to your component's decorator (making sure to also
+provide either `HTTP_PROVIDERS` or `HttpModule` in your app module):
 
 ```typescript
 import { Component } from '@angular/core';

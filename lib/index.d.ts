@@ -1,2 +1,4 @@
-import InlineSVGDirective from './inline-svg';
+import InlineSVGDirective from './inline-svg.directive';
 export { InlineSVGDirective };
+export declare class InlineSVGModule {
+}

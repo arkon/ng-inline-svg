@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/platform-browser';
 
-import SVGCache from './svg-cache';
+import SVGCache from './svg-cache.service';
 
 @Directive({
   selector: '[inlineSVG]',

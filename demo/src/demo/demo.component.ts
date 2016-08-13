@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { InlineSVGDirective } from 'ng2-inline-svg';
 
 @Component({
   selector: 'demo',
-  directives: [InlineSVGDirective],
   template: `
     <div class="demo-svg1" aria-label="My icon 1" [inlineSVG]="'img/image.svg'"></div>
     <div class="demo-svg2" aria-label="My icon 2" [inlineSVG]="'img/image.svg'"></div>

@@ -10,10 +10,10 @@
     "outDir": "lib/"
   },
   "files": [
+    "typings/index.d.ts",
     "src/index.ts",
-    "src/inline-svg.ts",
-    "src/svg-cache.ts",
-    "typings/index.d.ts"
+    "src/inline-svg.directive.ts",
+    "src/svg-cache.service.ts"
   ],
   "compileOnSave": false,
   "buildOnSave": false
