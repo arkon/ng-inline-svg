@@ -27,7 +27,7 @@ Make sure to add `HTTP_PROVIDERS` to your list of bootstrap providers:
 import { bootstrap } from '@angular/platform-browser-dynamic';
 import { HTTP_PROVIDERS } from '@angular/http';
 
-import { App } from './app/app.component';
+import { AppComponent } from './app/app.component';
 
 bootstrap(App, [HTTP_PROVIDERS]);
 ```
@@ -36,16 +36,16 @@ Import the component and add it to the list of directives on your component:
 
 ```typescript
 import { Component } from '@angular/core';
-import InlineSVG from 'ng2-inline-svg';
+import { InlineSVGDirective } from 'ng2-inline-svg';
 
 @Component({
   selector: 'app',
-  directives: [InlineSVG],
+  directives: [InlineSVGDirective],
   template: `
     <div class="my-icon" aria-label="My icon" [inlineSVG]="'/img/image.svg'"></div>
   `
 })
-export class App {
+export class AppComponent {
 }
 ```
 

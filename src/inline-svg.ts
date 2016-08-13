@@ -17,7 +17,7 @@ import SVGCache from './svg-cache';
   selector: '[inlineSVG]',
   providers: [SVGCache]
 })
-export default class InlineSVG implements OnInit, OnChanges {
+export default class InlineSVGDirective implements OnInit, OnChanges {
   @Input() replaceContents: boolean = true;
   @Input() cacheSVG: boolean = true;
 

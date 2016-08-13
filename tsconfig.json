@@ -7,10 +7,11 @@
     "experimentalDecorators": true,
     "declaration": true,
     "removeComments": true,
-    "outDir": "dist/"
+    "outDir": "lib/"
   },
   "files": [
-    "src/ng2-inline-svg.ts",
+    "src/index.ts",
+    "src/inline-svg.ts",
     "src/svg-cache.ts",
     "typings/index.d.ts"
   ],
