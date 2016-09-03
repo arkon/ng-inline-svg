@@ -69,6 +69,9 @@ Replaces the contents of the element with the SVG instead of just appending it t
 
 Default: `true`
 
+#### `[removeSVGAttributes]`
+An array of attribute names to remove from all child elements within the SVG.
+
 ### Outputs
 
 #### `(onSVGInserted)`
