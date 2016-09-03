@@ -4,14 +4,16 @@ export default class InlineSVGDirective implements OnInit, OnChanges {
     private _document;
     private _el;
     private _svgCache;
+    inlineSVG: string;
     replaceContents: boolean;
     cacheSVG: boolean;
+    removeSVGAttributes: Array<string>;
     onSVGInserted: EventEmitter<SVGElement>;
-    private inlineSVG;
     private _absUrl;
     constructor(_document: HTMLDocument, _el: ElementRef, _svgCache: SVGCache);
     ngOnInit(): void;
     ngOnChanges(changes: SimpleChanges): void;
     private _insertSVG();
     private _getAbsoluteUrl(url);
+    private _removeAttributes(svg, attrs);
 }

@@ -18,12 +18,12 @@ import SVGCache from './svg-cache.service';
   providers: [SVGCache]
 })
 export default class InlineSVGDirective implements OnInit, OnChanges {
+  @Input() inlineSVG: string;
   @Input() replaceContents: boolean = true;
   @Input() cacheSVG: boolean = true;
+  @Input() removeSVGAttributes: Array<string>;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
-
-  @Input() private inlineSVG: string;
 
   private _absUrl: string;
 
@@ -67,6 +67,10 @@ export default class InlineSVGDirective implements OnInit, OnChanges {
                 this._el.nativeElement.innerHTML = '';
               }
 
+              if (this.removeSVGAttributes) {
+                this._removeAttributes(svg, this.removeSVGAttributes);
+              }
+
               this._el.nativeElement.appendChild(svg);
               this.onSVGInserted.emit(svg);
             }
@@ -83,5 +87,19 @@ export default class InlineSVGDirective implements OnInit, OnChanges {
     base.href = url;
 
     return base.href;
+  }
+
+  private _removeAttributes(svg: SVGElement, attrs: Array<string>) {
+    const innerEls = svg.getElementsByTagName('*');
+
+    for (let i = 0; i < innerEls.length; i++) {
+      const elAttrs = innerEls[i].attributes;
+
+      for (let j = 0; j < elAttrs.length; j++) {
+        if (attrs.indexOf(elAttrs[j].name.toLowerCase()) > -1) {
+          innerEls[i].removeAttribute(elAttrs[j].name);
+        }
+      }
+    }
   }
 }
