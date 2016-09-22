@@ -55,7 +55,7 @@ export default class SVGCache {
     return req;
   }
 
-  private _svgElementFromString(str: string): SVGElement {
+  private _svgElementFromString(str: string): SVGElement | never {
     const div: HTMLElement = this._document.createElement('DIV');
     div.innerHTML = str;
 
