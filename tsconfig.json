@@ -7,13 +7,11 @@
     "experimentalDecorators": true,
     "declaration": true,
     "removeComments": true,
-    "outDir": "lib/"
+    "outDir": "lib/",
+    "lib": ["dom", "es5", "es2015.core", "es2015.collection", "es2015.promise"]
   },
-  "files": [
-    "typings/index.d.ts",
-    "src/index.ts",
-    "src/inline-svg.directive.ts",
-    "src/svg-cache.service.ts"
+  "include": [
+    "src/**/*"
   ],
   "compileOnSave": false,
   "buildOnSave": false
