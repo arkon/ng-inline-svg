@@ -38,8 +38,7 @@ export default class InlineSVGDirective implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['inlineSVG'] &&
-      changes['inlineSVG'].currentValue !== changes['inlineSVG'].previousValue) {
+    if (changes['inlineSVG']) {
       this._insertSVG();
     }
   }
@@ -48,6 +47,23 @@ export default class InlineSVGDirective implements OnInit, OnChanges {
     // Check if a URL was actually passed into the directive
     if (!this.inlineSVG) {
       console.error('No URL passed to [inlineSVG]!');
+      return;
+    }
+
+    // Support for symbol ID
+    if (this.inlineSVG.charAt(0) === '#') {
+      const elSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const elSvgUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      elSvgUse.setAttribute('xlink:href', this.inlineSVG);
+      elSvg.appendChild(elSvgUse);
+
+      if (this.replaceContents) {
+        this._el.nativeElement.innerHTML = '';
+      }
+
+      this._el.nativeElement.appendChild(elSvg);
+      this.onSVGInserted.emit(elSvg);
+
       return;
     }
 
