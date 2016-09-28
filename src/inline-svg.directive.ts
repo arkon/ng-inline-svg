@@ -51,9 +51,10 @@ export default class InlineSVGDirective implements OnInit, OnChanges {
     }
 
     // Support for symbol ID
-    if (this.inlineSVG.charAt(0) === '#') {
+    if (this.inlineSVG.charAt(0) === '#' || this.inlineSVG.indexOf('.svg#') > -1) {
       const elSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       const elSvgUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      elSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       elSvgUse.setAttribute('xlink:href', this.inlineSVG);
       elSvg.appendChild(elSvgUse);
 
