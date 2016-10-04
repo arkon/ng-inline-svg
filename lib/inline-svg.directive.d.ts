@@ -1,6 +1,6 @@
 import { ElementRef, EventEmitter, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import SVGCache from './svg-cache.service';
-export default class InlineSVGDirective implements OnInit, OnChanges {
+import { SVGCache } from './svg-cache.service';
+export declare class InlineSVGDirective implements OnInit, OnChanges {
     private _document;
     private _el;
     private _svgCache;
@@ -10,7 +10,7 @@ export default class InlineSVGDirective implements OnInit, OnChanges {
     removeSVGAttributes: Array<string>;
     onSVGInserted: EventEmitter<SVGElement>;
     private _absUrl;
-    constructor(_document: HTMLDocument, _el: ElementRef, _svgCache: SVGCache);
+    constructor(_document: any, _el: ElementRef, _svgCache: SVGCache);
     ngOnInit(): void;
     ngOnChanges(changes: SimpleChanges): void;
     private _insertSVG();

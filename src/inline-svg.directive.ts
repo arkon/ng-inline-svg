@@ -11,13 +11,13 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/platform-browser';
 
-import SVGCache from './svg-cache.service';
+import { SVGCache } from './svg-cache.service';
 
 @Directive({
   selector: '[inlineSVG]',
   providers: [SVGCache]
 })
-export default class InlineSVGDirective implements OnInit, OnChanges {
+export class InlineSVGDirective implements OnInit, OnChanges {
   @Input() inlineSVG: string;
   @Input() replaceContents: boolean = true;
   @Input() cacheSVG: boolean = true;
@@ -28,7 +28,7 @@ export default class InlineSVGDirective implements OnInit, OnChanges {
   private _absUrl: string;
 
   constructor(
-    @Inject(DOCUMENT) private _document: HTMLDocument,
+    @Inject(DOCUMENT) private _document /*: HTMLDocument*/,
     private _el: ElementRef,
     private _svgCache: SVGCache) {
   }
@@ -51,22 +51,22 @@ export default class InlineSVGDirective implements OnInit, OnChanges {
     }
 
     // Support for symbol ID
-    if (this.inlineSVG.charAt(0) === '#' || this.inlineSVG.indexOf('.svg#') > -1) {
-      const elSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const elSvgUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-      elSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-      elSvgUse.setAttribute('xlink:href', this.inlineSVG);
-      elSvg.appendChild(elSvgUse);
+    // if (this.inlineSVG.charAt(0) === '#' || this.inlineSVG.indexOf('.svg#') > -1) {
+    //   const elSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    //   const elSvgUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    //   elSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    //   elSvgUse.setAttribute('xlink:href', this.inlineSVG);
+    //   elSvg.appendChild(elSvgUse);
 
-      if (this.replaceContents) {
-        this._el.nativeElement.innerHTML = '';
-      }
+    //   if (this.replaceContents) {
+    //     this._el.nativeElement.innerHTML = '';
+    //   }
 
-      this._el.nativeElement.appendChild(elSvg);
-      this.onSVGInserted.emit(elSvg);
+    //   this._el.nativeElement.appendChild(elSvg);
+    //   this.onSVGInserted.emit(elSvg);
 
-      return;
-    }
+    //   return;
+    // }
 
     // Get absolute URL, and check if it's actually new
     const absUrl = this._getAbsoluteUrl(this.inlineSVG);

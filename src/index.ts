@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 
-import InlineSVGDirective from './inline-svg.directive';
-
-export { InlineSVGDirective };
+import { InlineSVGDirective } from './inline-svg.directive';
 
 @NgModule({
   declarations: [InlineSVGDirective],

@@ -9,12 +9,12 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 
 @Injectable()
-export default class SVGCache {
+export class SVGCache {
   private static _cache: Map<string, SVGElement>;
   private static _inProgressReqs: Map<string, Observable<SVGElement>>;
 
   constructor(
-    @Inject(DOCUMENT) private _document: HTMLDocument,
+    @Inject(DOCUMENT) private _document /*: HTMLDocument*/,
     private _http: Http) {
     if (!SVGCache._cache) {
       SVGCache._cache = new Map<string, SVGElement>();
