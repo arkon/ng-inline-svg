@@ -50,9 +50,9 @@ export class AppComponent {
 The SVG file (if found) will be inserted *inside* the element with the `[inlineSVG]` directive.
 
 
-## Options
+### Options
 
-### Inputs
+#### Inputs
 
 | Property name | Type | Default | Description |
 | ------------- | ---- | ------- | ----------- |
@@ -60,7 +60,7 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 | replaceContents | boolean | `true` | Replaces the contents of the element with the SVG instead of just appending it to its children. |
 | removeSVGAttributes | Array<string> | | An array of attribute names to remove from all child elements within the SVG. |
 
-### Outputs
+#### Outputs
 
 | Property name | Callback arguments | Description |
 | ------------- | ------------------ | ----------- |
