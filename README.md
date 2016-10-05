@@ -58,7 +58,7 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 | ------------- | ---- | ------- | ----------- |
 | cacheSVG | boolean | `true` | Caches the SVG based on the absolute URL. Cache only persists for the (sessional) lifetime of the page. |
 | replaceContents | boolean | `true` | Replaces the contents of the element with the SVG instead of just appending it to its children. |
-| removeSVGAttributes | Array<string> | | An array of attribute names to remove from all child elements within the SVG. |
+| removeSVGAttributes | string[] | | An array of attribute names to remove from all child elements within the SVG. |
 
 #### Outputs
 
