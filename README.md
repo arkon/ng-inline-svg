@@ -7,7 +7,7 @@
 Angular 2 directive for inserting an SVG inline within an element, allowing for easily styling
 with CSS like `fill: currentColor;`.
 
-This is based on [md-icon](https://github.com/angular/material2/tree/master/src/components/icon),
+This is based on [md-icon](https://github.com/angular/material2/tree/master/src/lib/icon),
 except this is meant purely for inserting SVG files within an element, without the extra things like
 font icons.
 
