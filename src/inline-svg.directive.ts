@@ -25,6 +25,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
 
+  /** @internal */
   private _absUrl: string;
 
   constructor(
@@ -43,6 +44,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
     }
   }
 
+  /** @internal */
   private _insertSVG(): void {
     // Check if a URL was actually passed into the directive
     if (!this.inlineSVG) {
@@ -99,6 +101,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
     }
   }
 
+  /** @internal */
   private _getAbsoluteUrl(url: string): string {
     const base = this._document.createElement('BASE') as HTMLBaseElement;
     base.href = url;
@@ -106,6 +109,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
     return base.href;
   }
 
+  /** @internal */
   private _removeAttributes(svg: SVGElement, attrs: Array<string>) {
     const innerEls = svg.getElementsByTagName('*');
 

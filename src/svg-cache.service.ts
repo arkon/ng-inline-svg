@@ -10,11 +10,14 @@ import 'rxjs/add/operator/share';
 
 @Injectable()
 export class SVGCache {
+  /** @internal */
   private static _cache: Map<string, SVGElement>;
+
+  /** @internal */
   private static _inProgressReqs: Map<string, Observable<SVGElement>>;
 
   constructor(
-    @Inject(DOCUMENT) private _document /*: HTMLDocument*/,
+    @Inject(DOCUMENT) private _document /*: HTMLDocument */,
     private _http: Http) {
     if (!SVGCache._cache) {
       SVGCache._cache = new Map<string, SVGElement>();
@@ -55,6 +58,7 @@ export class SVGCache {
     return req;
   }
 
+  /** @internal */
   private _svgElementFromString(str: string): SVGElement | never {
     const div: HTMLElement = this._document.createElement('DIV');
     div.innerHTML = str;
@@ -68,6 +72,7 @@ export class SVGCache {
     return svg;
   }
 
+  /** @internal */
   private _cloneSVG(svg: SVGElement): SVGElement {
     return svg.cloneNode(true) as SVGElement;
   }
