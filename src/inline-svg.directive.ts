@@ -83,7 +83,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
           (svg: SVGElement) => {
             // Insert SVG
             if (svg && this._el.nativeElement) {
-              if (this.replaceContents) {
+              if (this.replaceContents && !this.prepend) {
                 this._el.nativeElement.innerHTML = '';
               }
 
