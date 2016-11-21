@@ -20,6 +20,7 @@ import { SVGCache } from './svg-cache.service';
 export class InlineSVGDirective implements OnInit, OnChanges {
   @Input() inlineSVG: string;
   @Input() replaceContents: boolean = true;
+  @Input() prepend: boolean = false;
   @Input() cacheSVG: boolean = true;
   @Input() removeSVGAttributes: Array<string>;
 
@@ -90,7 +91,12 @@ export class InlineSVGDirective implements OnInit, OnChanges {
                 this._removeAttributes(svg, this.removeSVGAttributes);
               }
 
-              this._el.nativeElement.appendChild(svg);
+              if (this.prepend) {
+                this._el.nativeElement.insertBefore(svg, this._el.nativeElement.firstChild);
+              } else {
+                this._el.nativeElement.appendChild(svg);
+              }
+
               this.onSVGInserted.emit(svg);
             }
           },
