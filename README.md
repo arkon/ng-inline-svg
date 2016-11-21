@@ -57,6 +57,7 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 | Property name | Type | Default | Description |
 | ------------- | ---- | ------- | ----------- |
 | cacheSVG | boolean | `true` | Caches the SVG based on the absolute URL. Cache only persists for the (sessional) lifetime of the page. |
+| prepend | boolean | `false` | Inserts before the first child instead of appending, overwrites `replaceContents` |
 | replaceContents | boolean | `true` | Replaces the contents of the element with the SVG instead of just appending it to its children. |
 | removeSVGAttributes | string[] | | An array of attribute names to remove from all child elements within the SVG. |
 
