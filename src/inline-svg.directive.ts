@@ -47,9 +47,19 @@ export class InlineSVGDirective implements OnInit, OnChanges {
 
   /** @internal */
   private _insertSVG(): void {
+    // Check if the browser supports embed SVGs
+    if (!this._supportSVG()) {
+      if (window.console) {
+        console.error('Your browser does not support embed SVGs');
+      }
+      return;
+    }
+
     // Check if a URL was actually passed into the directive
     if (!this.inlineSVG) {
-      console.error('No URL passed to [inlineSVG]!');
+      if (window.console) {
+        console.error('No URL passed to [inlineSVG]!');
+      }
       return;
     }
 
@@ -101,7 +111,9 @@ export class InlineSVGDirective implements OnInit, OnChanges {
             }
           },
           (err: any) => {
-            console.error(err);
+            if (window.console) {
+              console.error(err);
+            }
           }
         );
     }
@@ -128,5 +140,10 @@ export class InlineSVGDirective implements OnInit, OnChanges {
         }
       }
     }
+  }
+
+  /** @internal */
+  private _supportSVG() {
+    return typeof SVGRect !== 'undefined';
   }
 }
