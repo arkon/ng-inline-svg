@@ -25,6 +25,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   @Input() removeSVGAttributes: Array<string>;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
+  @Output() onSVGFailed: EventEmitter<any> = new EventEmitter<any>();
 
   /** @internal */
   private _absUrl: string;
@@ -49,17 +50,13 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   private _insertSVG(): void {
     // Check if the browser supports embed SVGs
     if (!this._supportSVG()) {
-      if (window.console) {
-        console.error('Your browser does not support embed SVGs');
-      }
+      this.onSVGFailed.emit('Embed SVG not supported by browser');
       return;
     }
 
     // Check if a URL was actually passed into the directive
     if (!this.inlineSVG) {
-      if (window.console) {
-        console.error('No URL passed to [inlineSVG]!');
-      }
+      this.onSVGFailed.emit('No URL passed to [inlineSVG]');
       return;
     }
 
@@ -111,9 +108,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
             }
           },
           (err: any) => {
-            if (window.console) {
-              console.error(err);
-            }
+            this.onSVGFailed.emit(err);
           }
         );
     }

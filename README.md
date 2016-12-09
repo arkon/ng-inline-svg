@@ -66,3 +66,4 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 | Property name | Callback arguments | Description |
 | ------------- | ------------------ | ----------- |
 | onSVGInserted | `e: SVGElement` | Emits the `SVGElement` post-insertion. |
+| onSVGFailed | `e: any` | Emits when there is some error (e.g. embed SVG not supported, fetch failed, etc.) |
