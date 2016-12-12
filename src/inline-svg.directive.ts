@@ -23,6 +23,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   @Input() prepend: boolean = false;
   @Input() cacheSVG: boolean = true;
   @Input() removeSVGAttributes: Array<string>;
+  @Input() forceEvalStyles: boolean = false;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
   @Output() onSVGFailed: EventEmitter<any> = new EventEmitter<any>();
@@ -102,6 +103,12 @@ export class InlineSVGDirective implements OnInit, OnChanges {
                 this._el.nativeElement.insertBefore(svg, this._el.nativeElement.firstChild);
               } else {
                 this._el.nativeElement.appendChild(svg);
+              }
+
+              // See https://github.com/arkon/ng2-inline-svg/issues/17
+              if (this.forceEvalStyles) {
+                const styleTags = svg.querySelectorAll('style');
+                Array.prototype.forEach.call(styleTags, tag => tag.textContent += '');
               }
 
               this.onSVGInserted.emit(svg);

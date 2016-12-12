@@ -60,6 +60,7 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 | prepend | boolean | `false` | Inserts before the first child instead of appending, overwrites `replaceContents` |
 | replaceContents | boolean | `true` | Replaces the contents of the element with the SVG instead of just appending it to its children. |
 | removeSVGAttributes | string[] | | An array of attribute names to remove from all child elements within the SVG. |
+| forceEvalStyles | boolean | `false` | Forces embeded style tags' contents to be evaluated (for IE 11).
 
 #### Outputs
 
