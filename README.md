@@ -1,10 +1,12 @@
-# ng2-inline-svg
+# ng-inline-svg
 
-[![NPM](https://nodei.co/npm/ng2-inline-svg.png?compact=true)](https://nodei.co/npm/ng2-inline-svg)
+[![NPM](https://nodei.co/npm/ng-inline-svg.png?compact=true)](https://nodei.co/npm/ng-inline-svg)
 
-**[Demo](https://echeung.me/ng2-inline-svg)**
+**[Demo](https://echeung.me/ng-inline-svg)**
 
-Angular 2 directive for inserting an SVG inline within an element, allowing for easily styling
+*Formally called [ng2-inline-svg](https://github.com/arkon/ng2-inline-svg)*
+
+Angular 2+ directive for inserting an SVG inline within an element, allowing for easily styling
 with CSS like `fill: currentColor;`.
 
 This is based on [md-icon](https://github.com/angular/material2/tree/master/src/lib/icon),
@@ -15,7 +17,7 @@ font icons.
 ## Installation
 
 ```shell
-npm install --save ng2-inline-svg
+npm install --save ng-inline-svg
 ```
 
 
@@ -24,7 +26,7 @@ npm install --save ng2-inline-svg
 Add `InlineSVGModule` to your list of module imports:
 
 ```typescript
-import { InlineSVGModule } from 'ng2-inline-svg';
+import { InlineSVGModule } from 'ng-inline-svg';
 
 @NgModule({
   declarations: [AppComponent],

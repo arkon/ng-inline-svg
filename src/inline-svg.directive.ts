@@ -105,7 +105,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
                 this._el.nativeElement.appendChild(svg);
               }
 
-              // See https://github.com/arkon/ng2-inline-svg/issues/17
+              // See https://github.com/arkon/ng-inline-svg/issues/17
               if (this.forceEvalStyles) {
                 const styleTags = svg.querySelectorAll('style');
                 Array.prototype.forEach.call(styleTags, tag => tag.textContent += '');
