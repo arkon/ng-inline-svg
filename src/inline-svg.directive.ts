@@ -24,6 +24,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   @Input() cacheSVG: boolean = true;
   @Input() removeSVGAttributes: Array<string>;
   @Input() forceEvalStyles: boolean = false;
+  @Input() fallbackImgUrl: string;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
   @Output() onSVGFailed: EventEmitter<any> = new EventEmitter<any>();
@@ -51,13 +52,13 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   private _insertSVG(): void {
     // Check if the browser supports embed SVGs
     if (!this._supportSVG()) {
-      this.onSVGFailed.emit('Embed SVG not supported by browser');
+      this._fail('Embed SVG not supported by browser');
       return;
     }
 
     // Check if a URL was actually passed into the directive
     if (!this.inlineSVG) {
-      this.onSVGFailed.emit('No URL passed to [inlineSVG]');
+      this._fail('No URL passed to [inlineSVG]');
       return;
     }
 
@@ -115,7 +116,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
             }
           },
           (err: any) => {
-            this.onSVGFailed.emit(err);
+            this._fail(err);
           }
         );
     }
@@ -147,5 +148,25 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   /** @internal */
   private _supportSVG() {
     return typeof SVGRect !== 'undefined';
+  }
+
+  /** @internal */
+  private _fail(msg: string) {
+    this.onSVGFailed.emit(msg);
+
+    if (this.fallbackImgUrl) {
+      if (this.replaceContents && !this.prepend) {
+        this._el.nativeElement.innerHTML = '';
+      }
+
+      const elImg = document.createElement('img');
+      elImg.src = this.fallbackImgUrl;
+
+      if (this.prepend) {
+        this._el.nativeElement.insertBefore(elImg, this._el.nativeElement.firstChild);
+      } else {
+        this._el.nativeElement.appendChild(elImg);
+      }
+    }
   }
 }
