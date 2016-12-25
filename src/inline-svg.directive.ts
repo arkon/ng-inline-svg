@@ -32,6 +32,9 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   /** @internal */
   private _absUrl: string;
 
+  /** @internal */
+  private _supportsSVG: boolean = true;
+
   constructor(
     @Inject(DOCUMENT) private _document /*: HTMLDocument*/,
     private _el: ElementRef,
@@ -50,9 +53,14 @@ export class InlineSVGDirective implements OnInit, OnChanges {
 
   /** @internal */
   private _insertSVG(): void {
+    if (!this._supportsSVG) {
+      return;
+    }
+
     // Check if the browser supports embed SVGs
-    if (!this._supportSVG()) {
+    if (!this._checkSVGSupport()) {
       this._fail('Embed SVG not supported by browser');
+      this._supportsSVG = false;
       return;
     }
 
@@ -146,7 +154,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   }
 
   /** @internal */
-  private _supportSVG() {
+  private _checkSVGSupport() {
     return typeof SVGRect !== 'undefined';
   }
 
@@ -154,6 +162,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   private _fail(msg: string) {
     this.onSVGFailed.emit(msg);
 
+    // Insert fallback image, if specified
     if (this.fallbackImgUrl) {
       if (this.replaceContents && !this.prepend) {
         this._el.nativeElement.innerHTML = '';
