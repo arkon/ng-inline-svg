@@ -71,22 +71,21 @@ export class InlineSVGDirective implements OnInit, OnChanges {
     }
 
     // Support for symbol ID
-    // if (this.inlineSVG.charAt(0) === '#' || this.inlineSVG.indexOf('.svg#') > -1) {
-    //   const elSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    //   const elSvgUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-    //   elSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    //   elSvgUse.setAttribute('xlink:href', this.inlineSVG);
-    //   elSvg.appendChild(elSvgUse);
+    if (this.inlineSVG.charAt(0) === '#' || this.inlineSVG.indexOf('.svg#') > -1) {
+      const elSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const elSvgUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      elSvgUse.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.inlineSVG);
+      elSvg.appendChild(elSvgUse);
 
-    //   if (this.replaceContents) {
-    //     this._el.nativeElement.innerHTML = '';
-    //   }
+      if (this.replaceContents) {
+        this._el.nativeElement.innerHTML = '';
+      }
 
-    //   this._el.nativeElement.appendChild(elSvg);
-    //   this.onSVGInserted.emit(elSvg);
+      this._el.nativeElement.appendChild(elSvg);
+      this.onSVGInserted.emit(elSvg);
 
-    //   return;
-    // }
+      return;
+    }
 
     // Get absolute URL, and check if it's actually new
     const absUrl = this._getAbsoluteUrl(this.inlineSVG);
