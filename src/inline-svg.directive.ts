@@ -70,25 +70,16 @@ export class InlineSVGDirective implements OnInit, OnChanges {
       return;
     }
 
-    // Support for symbol ID
+    // Support for symbol IDs
     if (this.inlineSVG.charAt(0) === '#' || this.inlineSVG.indexOf('.svg#') > -1) {
       const elSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       const elSvgUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
       elSvgUse.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.inlineSVG);
       elSvg.appendChild(elSvgUse);
 
-      if (this.replaceContents && !this.prepend) {
-        this._el.nativeElement.innerHTML = '';
-      }
-
-      if (this.prepend) {
-        this._el.nativeElement.insertBefore(elSvg, this._el.nativeElement.firstChild);
-      } else {
-        this._el.nativeElement.appendChild(elSvg);
-      }
+      this._insertEl(elSvg);
 
       this.onSVGInserted.emit(elSvg);
-
       return;
     }
 
@@ -104,21 +95,14 @@ export class InlineSVGDirective implements OnInit, OnChanges {
           (svg: SVGElement) => {
             // Insert SVG
             if (svg && this._el.nativeElement) {
-              if (this.replaceContents && !this.prepend) {
-                this._el.nativeElement.innerHTML = '';
-              }
-
               if (this.removeSVGAttributes) {
                 this._removeAttributes(svg, this.removeSVGAttributes);
               }
 
-              if (this.prepend) {
-                this._el.nativeElement.insertBefore(svg, this._el.nativeElement.firstChild);
-              } else {
-                this._el.nativeElement.appendChild(svg);
-              }
+              this._insertEl(svg);
 
-              // See https://github.com/arkon/ng-inline-svg/issues/17
+              // Force evaluation of <style> tags since IE doesn't do it.
+              // Reference: https://github.com/arkon/ng-inline-svg/issues/17
               if (this.forceEvalStyles) {
                 const styleTags = svg.querySelectorAll('style');
                 Array.prototype.forEach.call(styleTags, tag => tag.textContent += '');
@@ -158,6 +142,19 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   }
 
   /** @internal */
+  private _insertEl(el: Element) {
+    if (this.replaceContents && !this.prepend) {
+      this._el.nativeElement.innerHTML = '';
+    }
+
+    if (this.prepend) {
+      this._el.nativeElement.insertBefore(el, this._el.nativeElement.firstChild);
+    } else {
+      this._el.nativeElement.appendChild(el);
+    }
+  }
+
+  /** @internal */
   private _checkSVGSupport() {
     return typeof SVGRect !== 'undefined';
   }
@@ -168,18 +165,10 @@ export class InlineSVGDirective implements OnInit, OnChanges {
 
     // Insert fallback image, if specified
     if (this.fallbackImgUrl) {
-      if (this.replaceContents && !this.prepend) {
-        this._el.nativeElement.innerHTML = '';
-      }
-
       const elImg = document.createElement('img');
       elImg.src = this.fallbackImgUrl;
 
-      if (this.prepend) {
-        this._el.nativeElement.insertBefore(elImg, this._el.nativeElement.firstChild);
-      } else {
-        this._el.nativeElement.appendChild(elImg);
-      }
+      this._insertEl(elImg);
     }
   }
 }
