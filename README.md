@@ -49,7 +49,7 @@ export class AppComponent {
 }
 ```
 
-The SVG file (if found) will be inserted *inside* the element with the `[inlineSVG]` directive. Support for icons using the [`symbol`](https://css-tricks.com/svg-symbol-good-choice-icons/) method is also supported (e.g. `[inlineSVG]="'#shape-id'"`).
+The SVG file (if found) will be inserted *inside* the element with the `[inlineSVG]` directive. Support for icons using the [`symbol` method](https://css-tricks.com/svg-symbol-good-choice-icons/) is also supported (e.g. `[inlineSVG]="'#shape-id'"`).
 
 
 ### Options

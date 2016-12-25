@@ -77,11 +77,16 @@ export class InlineSVGDirective implements OnInit, OnChanges {
       elSvgUse.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.inlineSVG);
       elSvg.appendChild(elSvgUse);
 
-      if (this.replaceContents) {
+      if (this.replaceContents && !this.prepend) {
         this._el.nativeElement.innerHTML = '';
       }
 
-      this._el.nativeElement.appendChild(elSvg);
+      if (this.prepend) {
+        this._el.nativeElement.insertBefore(elSvg, this._el.nativeElement.firstChild);
+      } else {
+        this._el.nativeElement.appendChild(elSvg);
+      }
+
       this.onSVGInserted.emit(elSvg);
 
       return;
