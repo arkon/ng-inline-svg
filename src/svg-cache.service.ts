@@ -1,6 +1,5 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, Renderer2 } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { DOCUMENT } from '@angular/platform-browser';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/catch';
@@ -17,7 +16,7 @@ export class SVGCache {
   private static _inProgressReqs: Map<string, Observable<SVGElement>>;
 
   constructor(
-    @Inject(DOCUMENT) private _document /*: HTMLDocument */,
+    private _renderer: Renderer2,
     private _http: Http) {
     if (!SVGCache._cache) {
       SVGCache._cache = new Map<string, SVGElement>();
@@ -60,7 +59,7 @@ export class SVGCache {
 
   /** @internal */
   private _svgElementFromString(str: string): SVGElement | never {
-    const div: HTMLElement = this._document.createElement('DIV');
+    const div: HTMLElement = this._renderer.createElement('DIV');
     div.innerHTML = str;
 
     const svg = div.querySelector('svg') as SVGElement;
