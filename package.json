@@ -37,21 +37,22 @@
     "prepublish": "npm run build"
   },
   "peerDependencies": {
-    "@angular/core": "^2.3.0",
-    "@angular/http": "^2.3.0",
-    "@angular/platform-browser": "^2.3.0"
+    "@angular/core": ">=2.3.0",
+    "@angular/http": ">=2.3.0",
+    "@angular/platform-browser": ">=2.3.0"
   },
   "devDependencies": {
-    "@angular/common": "^2.4.6",
-    "@angular/compiler": "^2.4.6",
-    "@angular/compiler-cli": "^2.4.6",
-    "@angular/core": "^2.4.6",
-    "@angular/http": "^2.4.6",
-    "@angular/platform-browser": "^2.4.6",
-    "@angular/platform-server": "^2.4.6",
-    "rxjs": "5.1.0",
-    "tslint": "^4.4.2",
-    "typescript": "^2.1.5",
-    "zone.js": "^0.7.6"
+    "@angular/animations": "^4.0.0",
+    "@angular/common": "^4.0.0",
+    "@angular/compiler": "^4.0.0",
+    "@angular/compiler-cli": "^4.0.0",
+    "@angular/core": "^4.0.0",
+    "@angular/http": "^4.0.0",
+    "@angular/platform-browser": "^4.0.0",
+    "@angular/platform-server": "^4.0.0",
+    "rxjs": "^5.2.0",
+    "tslint": "^4.5.1",
+    "typescript": "^2.2.1",
+    "zone.js": "^0.8.5"
   }
 }
