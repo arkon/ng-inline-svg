@@ -2,14 +2,13 @@ import {
   Directive,
   ElementRef,
   EventEmitter,
-  Inject,
   Input,
   OnChanges,
   OnInit,
   Output,
+  Renderer2,
   SimpleChanges
 } from '@angular/core';
-import { DOCUMENT } from '@angular/platform-browser';
 
 import { SVGCache } from './svg-cache.service';
 
@@ -40,7 +39,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   private _ranScripts: { [url: string]: boolean } = {};
 
   constructor(
-    @Inject(DOCUMENT) private _document /*: HTMLDocument*/,
+    private _renderer: Renderer2,
     private _el: ElementRef,
     private _svgCache: SVGCache) {
   }
@@ -76,10 +75,10 @@ export class InlineSVGDirective implements OnInit, OnChanges {
 
     // Support for symbol IDs
     if (this.inlineSVG.charAt(0) === '#' || this.inlineSVG.indexOf('.svg#') > -1) {
-      const elSvg = this._document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const elSvgUse = this._document.createElementNS('http://www.w3.org/2000/svg', 'use');
-      elSvgUse.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.inlineSVG);
-      elSvg.appendChild(elSvgUse);
+      const elSvg = this._renderer.createElement('svg', 'svg');
+      const elSvgUse = this._renderer.createElement('use', 'svg');
+      this._renderer.setAttribute(elSvgUse, 'href', this.inlineSVG, 'xlink');
+      this._renderer.appendChild(elSvg, elSvgUse);
 
       this._insertEl(elSvg);
 
@@ -127,7 +126,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
 
   /** @internal */
   private _getAbsoluteUrl(url: string): string {
-    const base = this._document.createElement('BASE') as HTMLBaseElement;
+    const base = this._renderer.createElement('BASE') as HTMLBaseElement;
     base.href = url;
 
     return base.href;
@@ -151,13 +150,13 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   /** @internal */
   private _insertEl(el: Element) {
     if (this.replaceContents && !this.prepend) {
-      this._el.nativeElement.innerHTML = '';
+      this._renderer.setProperty(this._el.nativeElement, 'innerHTML', '');
     }
 
     if (this.prepend) {
-      this._el.nativeElement.insertBefore(el, this._el.nativeElement.firstChild);
+      this._renderer.insertBefore(this._el.nativeElement, el, this._el.nativeElement.firstChild);
     } else {
-      this._el.nativeElement.appendChild(el);
+      this._renderer.appendChild(this._el.nativeElement, el);
     }
   }
 
@@ -201,7 +200,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
 
     // Insert fallback image, if specified
     if (this.fallbackImgUrl) {
-      const elImg = document.createElement('img');
+      const elImg = this._renderer.createElement('IMG');
       elImg.src = this.fallbackImgUrl;
 
       this._insertEl(elImg);
