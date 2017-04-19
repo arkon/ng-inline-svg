@@ -10,11 +10,11 @@ import {
   SimpleChanges
 } from '@angular/core';
 
-import { SVGCache } from './svg-cache.service';
+import { SVGCacheService } from './svg-cache.service';
 
 @Directive({
   selector: '[inlineSVG]',
-  providers: [SVGCache]
+  providers: [SVGCacheService]
 })
 export class InlineSVGDirective implements OnInit, OnChanges {
   @Input() inlineSVG: string;
@@ -30,7 +30,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   @Output() onSVGFailed: EventEmitter<any> = new EventEmitter<any>();
 
   /** @internal */
-  private _absUrl: string;
+  private _prevUrl: string;
 
   /** @internal */
   private _supportsSVG: boolean = true;
@@ -41,7 +41,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   constructor(
     private _renderer: Renderer2,
     private _el: ElementRef,
-    private _svgCache: SVGCache) {
+    private _svgCache: SVGCacheService) {
   }
 
   ngOnInit(): void {
@@ -86,14 +86,11 @@ export class InlineSVGDirective implements OnInit, OnChanges {
       return;
     }
 
-    // Get absolute URL, and check if it's actually new
-    const absUrl = this._getAbsoluteUrl(this.inlineSVG);
-
-    if (absUrl !== this._absUrl) {
-      this._absUrl = absUrl;
+    if (this.inlineSVG !== this._prevUrl) {
+      this._prevUrl = this.inlineSVG;
 
       // Fetch SVG via cache mechanism
-      this._svgCache.getSVG(this._absUrl, this.cacheSVG)
+      this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
         .subscribe(
           (svg: SVGElement) => {
             // Insert SVG
@@ -105,7 +102,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
               this._insertEl(svg);
 
               // Script evaluation
-              this._evalScripts(svg, absUrl);
+              this._evalScripts(svg, this.inlineSVG);
 
               // Force evaluation of <style> tags since IE doesn't do it.
               // Reference: https://github.com/arkon/ng-inline-svg/issues/17
@@ -122,14 +119,6 @@ export class InlineSVGDirective implements OnInit, OnChanges {
           }
         );
     }
-  }
-
-  /** @internal */
-  private _getAbsoluteUrl(url: string): string {
-    const base = this._renderer.createElement('BASE') as HTMLBaseElement;
-    base.href = url;
-
-    return base.href;
   }
 
   /** @internal */

@@ -36,6 +36,12 @@ import { InlineSVGModule } from 'ng-inline-svg';
 class AppModule {}
 ```
 
+If you want to configure the base URL, you can use the `forRoot` function:
+
+```typescript
+InlineSVGModule.forRoot({ baseUrl: 'https://mysite.com/myapp/' })
+```
+
 You can then use the directive in your templates:
 
 ```typescript

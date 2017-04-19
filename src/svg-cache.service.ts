@@ -1,4 +1,4 @@
-import { Injectable, Renderer2 } from '@angular/core';
+import { Injectable, Optional, Renderer2 } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
@@ -7,54 +7,81 @@ import 'rxjs/add/operator/finally';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 
+export class InlineSVGConfig {
+  baseUrl: string;
+}
+
 @Injectable()
-export class SVGCache {
+export class SVGCacheService {
   /** @internal */
   private static _cache: Map<string, SVGElement>;
 
   /** @internal */
   private static _inProgressReqs: Map<string, Observable<SVGElement>>;
 
+  /** @internal */
+  private _baseUrl: string;
+
   constructor(
+    @Optional() config: InlineSVGConfig,
     private _renderer: Renderer2,
     private _http: Http) {
-    if (!SVGCache._cache) {
-      SVGCache._cache = new Map<string, SVGElement>();
+    if (config) {
+      this._baseUrl = config.baseUrl;
     }
 
-    if (!SVGCache._inProgressReqs) {
-      SVGCache._inProgressReqs = new Map<string, Observable<SVGElement>>();
+    if (!SVGCacheService._cache) {
+      SVGCacheService._cache = new Map<string, SVGElement>();
+    }
+
+    if (!SVGCacheService._inProgressReqs) {
+      SVGCacheService._inProgressReqs = new Map<string, Observable<SVGElement>>();
     }
   }
 
   getSVG(url: string, cache: boolean = true): Observable<SVGElement> {
+    const absUrl = this._getAbsoluteUrl(url);
+
     // Return cached copy if it exists
-    if (cache && SVGCache._cache.has(url)) {
-      return Observable.of(this._cloneSVG(SVGCache._cache.get(url)));
+    if (cache && SVGCacheService._cache.has(absUrl)) {
+      return Observable.of(this._cloneSVG(SVGCacheService._cache.get(absUrl)));
     }
 
     // Return existing fetch observable
-    if (SVGCache._inProgressReqs.has(url)) {
-      return SVGCache._inProgressReqs.get(url);
+    if (SVGCacheService._inProgressReqs.has(absUrl)) {
+      return SVGCacheService._inProgressReqs.get(absUrl);
     }
 
     // Otherwise, make the HTTP call to fetch
-    const req = this._http.get(url)
+    const req = this._http.get(absUrl)
       .map((res: Response) => res.text())
       .catch((err: any) => err)
       .finally(() => {
-        SVGCache._inProgressReqs.delete(url);
+        SVGCacheService._inProgressReqs.delete(absUrl);
       })
       .share()
       .map((svgText: string) => {
         const svgEl = this._svgElementFromString(svgText);
-        SVGCache._cache.set(url, svgEl);
+        SVGCacheService._cache.set(absUrl, svgEl);
         return this._cloneSVG(svgEl);
       });
 
-    SVGCache._inProgressReqs.set(url, req);
+    SVGCacheService._inProgressReqs.set(absUrl, req);
 
     return req;
+  }
+
+  /** @internal */
+  private _getAbsoluteUrl(url: string): string {
+    // Prepend user-configured base if present
+    if (this._baseUrl) {
+      url = this._baseUrl + url;
+    }
+
+    const base = this._renderer.createElement('BASE') as HTMLBaseElement;
+    base.href = url;
+
+    return base.href;
   }
 
   /** @internal */
