@@ -9,6 +9,7 @@ import {
   Renderer2,
   SimpleChanges
 } from '@angular/core';
+import guard from 'ts-guard-decorator';
 
 import { SVGCacheService } from './svg-cache.service';
 
@@ -44,10 +45,12 @@ export class InlineSVGDirective implements OnInit, OnChanges {
     private _svgCache: SVGCacheService) {
   }
 
+  @guard(typeof window !== 'undefined')
   ngOnInit(): void {
     this._insertSVG();
   }
 
+  @guard(typeof window !== 'undefined')
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['inlineSVG']) {
       this._insertSVG();
