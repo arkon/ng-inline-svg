@@ -1,4 +1,4 @@
-import { Injectable, Optional, Renderer2 } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
@@ -24,7 +24,6 @@ export class SVGCacheService {
 
   constructor(
     @Optional() config: InlineSVGConfig,
-    private _renderer: Renderer2,
     private _http: Http) {
     if (config) {
       this._baseUrl = config.baseUrl;
@@ -78,7 +77,7 @@ export class SVGCacheService {
       url = this._baseUrl + url;
     }
 
-    const base = this._renderer.createElement('BASE') as HTMLBaseElement;
+    const base = document.createElement('BASE') as HTMLBaseElement;
     base.href = url;
 
     return base.href;
@@ -86,7 +85,7 @@ export class SVGCacheService {
 
   /** @internal */
   private _svgElementFromString(str: string): SVGElement | never {
-    const div: HTMLElement = this._renderer.createElement('DIV');
+    const div: HTMLElement = document.createElement('DIV');
     div.innerHTML = str;
 
     const svg = div.querySelector('svg') as SVGElement;
