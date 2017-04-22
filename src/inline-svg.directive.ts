@@ -8,7 +8,6 @@ import {
   Output,
   SimpleChanges
 } from '@angular/core';
-import guard from 'ts-guard-decorator';
 
 import { SVGCacheService } from './svg-cache.service';
 
@@ -43,13 +42,15 @@ export class InlineSVGDirective implements OnInit, OnChanges {
     private _svgCache: SVGCacheService) {
   }
 
-  @guard(typeof window !== 'undefined')
   ngOnInit(): void {
+    if (!this._isBrowser()) { return; }
+
     this._insertSVG();
   }
 
-  @guard(typeof window !== 'undefined')
   ngOnChanges(changes: SimpleChanges): void {
+    if (!this._isBrowser()) { return; }
+
     if (changes['inlineSVG']) {
       this._insertSVG();
     }
@@ -180,11 +181,6 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   }
 
   /** @internal */
-  private _checkSVGSupport() {
-    return typeof SVGRect !== 'undefined';
-  }
-
-  /** @internal */
   private _fail(msg: string) {
     this.onSVGFailed.emit(msg);
 
@@ -195,5 +191,15 @@ export class InlineSVGDirective implements OnInit, OnChanges {
 
       this._insertEl(elImg);
     }
+  }
+
+  /** @internal */
+  private _checkSVGSupport() {
+    return typeof SVGRect !== 'undefined';
+  }
+
+  /** @internal */
+  private _isBrowser(): boolean {
+    return typeof window !== 'undefined';
   }
 }
