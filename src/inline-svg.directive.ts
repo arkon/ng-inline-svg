@@ -2,18 +2,21 @@ import {
   Directive,
   ElementRef,
   EventEmitter,
+  Inject,
   Input,
   OnChanges,
   OnInit,
+  OnDestroy,
   Output,
   SimpleChanges
 } from '@angular/core';
+import { DOCUMENT } from '@angular/platform-browser';
 
-import { SVGCacheService } from './svg-cache.service';
+import { SVGCache } from './svg-cache.service';
 
 @Directive({
   selector: '[inlineSVG]',
-  providers: [SVGCacheService]
+  providers: [SVGCache]
 })
 export class InlineSVGDirective implements OnInit, OnChanges {
   @Input() inlineSVG: string;
@@ -29,7 +32,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   @Output() onSVGFailed: EventEmitter<any> = new EventEmitter<any>();
 
   /** @internal */
-  private _prevUrl: string;
+  private _absUrl: string;
 
   /** @internal */
   private _supportsSVG: boolean = true;
@@ -37,23 +40,34 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   /** @internal */
   private _ranScripts: { [url: string]: boolean } = {};
 
+  /** @internal */
+  private _subscriptionSvgCache;
+
   constructor(
+    @Inject(DOCUMENT) private _document /*: HTMLDocument*/,
     private _el: ElementRef,
-    private _svgCache: SVGCacheService) {
+    private _svgCache: SVGCache) {
   }
 
   ngOnInit(): void {
-    if (!this._isBrowser()) { return; }
-
     this._insertSVG();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!this._isBrowser()) { return; }
-
     if (changes['inlineSVG']) {
+      // work around
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=370763
+      let el = document.getElementById('_ng2_inline_svg');
+      if (el) {
+        el.remove();
+      }
+
       this._insertSVG();
     }
+  }
+
+  ngOnDestroy() {
+    this._subscriptionSvgCache.unsubscribe();
   }
 
   /** @internal */
@@ -77,22 +91,26 @@ export class InlineSVGDirective implements OnInit, OnChanges {
 
     // Support for symbol IDs
     if (this.inlineSVG.charAt(0) === '#' || this.inlineSVG.indexOf('.svg#') > -1) {
-      const elSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const elSvgUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-      elSvgUse.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.inlineSVG);
-      elSvg.appendChild(elSvgUse);
+      const svgDOMElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const svgUseElement = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      svgUseElement.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.inlineSVG);
+      svgDOMElement.setAttribute('id', '_ng2_inline_svg');
+      svgDOMElement.appendChild(svgUseElement);
 
-      this._insertEl(elSvg);
+      this._insertEl(svgDOMElement);
 
-      this.onSVGInserted.emit(elSvg);
+      this.onSVGInserted.emit(svgDOMElement);
       return;
     }
 
-    if (this.inlineSVG !== this._prevUrl) {
-      this._prevUrl = this.inlineSVG;
+    // Get absolute URL, and check if it's actually new
+    const absUrl = this._getAbsoluteUrl(this.inlineSVG);
+
+    if (absUrl !== this._absUrl) {
+      this._absUrl = absUrl;
 
       // Fetch SVG via cache mechanism
-      this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
+      this._subscriptionSvgCache = this._svgCache.getSVG(this._absUrl, this.cacheSVG)
         .subscribe(
           (svg: SVGElement) => {
             // Insert SVG
@@ -104,7 +122,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
               this._insertEl(svg);
 
               // Script evaluation
-              this._evalScripts(svg, this.inlineSVG);
+              this._evalScripts(svg, absUrl);
 
               // Force evaluation of <style> tags since IE doesn't do it.
               // Reference: https://github.com/arkon/ng-inline-svg/issues/17
@@ -121,6 +139,14 @@ export class InlineSVGDirective implements OnInit, OnChanges {
           }
         );
     }
+  }
+
+  /** @internal */
+  private _getAbsoluteUrl(url: string): string {
+    const base = this._document.createElement('BASE') as HTMLBaseElement;
+    base.href = url;
+
+    return base.href;
   }
 
   /** @internal */
@@ -181,25 +207,20 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   }
 
   /** @internal */
-  private _fail(msg: string) {
-    this.onSVGFailed.emit(msg);
-
-    // Insert fallback image, if specified
-    if (this.fallbackImgUrl) {
-      const elImg = document.createElement('IMG') as HTMLImageElement;
-      elImg.src = this.fallbackImgUrl;
-
-      this._insertEl(elImg);
-    }
-  }
-
-  /** @internal */
   private _checkSVGSupport() {
     return typeof SVGRect !== 'undefined';
   }
 
   /** @internal */
-  private _isBrowser(): boolean {
-    return typeof window !== 'undefined';
+  private _fail(msg: string) {
+    this.onSVGFailed.emit(msg);
+
+    // Insert fallback image, if specified
+    if (this.fallbackImgUrl) {
+      const elImg = document.createElement('img');
+      elImg.src = this.fallbackImgUrl;
+
+      this._insertEl(elImg);
+    }
   }
 }
