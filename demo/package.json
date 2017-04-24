@@ -19,17 +19,17 @@
     "node": ">=6"
   },
   "dependencies": {
-    "@angular/common": "^4.0.2",
-    "@angular/compiler": "^4.0.2",
-    "@angular/core": "^4.0.2",
-    "@angular/http": "^4.0.2",
-    "@angular/platform-browser": "^4.0.2",
-    "@angular/platform-browser-dynamic": "^4.0.2",
+    "@angular/common": "^4.0.3",
+    "@angular/compiler": "^4.0.3",
+    "@angular/core": "^4.0.3",
+    "@angular/http": "^4.0.3",
+    "@angular/platform-browser": "^4.0.3",
+    "@angular/platform-browser-dynamic": "^4.0.3",
     "es6-shim": "^0.35.3",
     "ng-inline-svg": "file:../",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.3.0",
-    "zone.js": "^0.8.5"
+    "zone.js": "^0.8.8"
   },
   "devDependencies": {
     "gh-pages": "^0.12.0",

@@ -4,10 +4,12 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   SimpleChanges
 } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
 
 import { SVGCacheService } from './svg-cache.service';
 
@@ -15,7 +17,7 @@ import { SVGCacheService } from './svg-cache.service';
   selector: '[inlineSVG]',
   providers: [SVGCacheService]
 })
-export class InlineSVGDirective implements OnInit, OnChanges {
+export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   @Input() inlineSVG: string;
   @Input() replaceContents: boolean = true;
   @Input() prepend: boolean = false;
@@ -37,6 +39,9 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   /** @internal */
   private _ranScripts: { [url: string]: boolean } = {};
 
+  /** @internal */
+  private _subscription: Subscription;
+
   constructor(
     private _el: ElementRef,
     private _svgCache: SVGCacheService) {
@@ -53,6 +58,12 @@ export class InlineSVGDirective implements OnInit, OnChanges {
 
     if (changes['inlineSVG']) {
       this._insertSVG();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this._subscription) {
+      this._subscription.unsubscribe();
     }
   }
 
@@ -92,7 +103,7 @@ export class InlineSVGDirective implements OnInit, OnChanges {
       this._prevUrl = this.inlineSVG;
 
       // Fetch SVG via cache mechanism
-      this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
+      this._subscription = this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
         .subscribe(
           (svg: SVGElement) => {
             // Insert SVG
@@ -124,6 +135,19 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   }
 
   /** @internal */
+  private _insertEl(el: Element) {
+    if (this.replaceContents && !this.prepend) {
+      this._el.nativeElement.innerHTML = '';
+    }
+
+    if (this.prepend) {
+      this._el.nativeElement.insertBefore(el, this._el.nativeElement.firstChild);
+    } else {
+      this._el.nativeElement.appendChild(el);
+    }
+  }
+
+  /** @internal */
   private _removeAttributes(svg: SVGElement, attrs: Array<string>) {
     const innerEls = svg.getElementsByTagName('*');
 
@@ -135,19 +159,6 @@ export class InlineSVGDirective implements OnInit, OnChanges {
           innerEls[i].removeAttribute(elAttrs[j].name);
         }
       }
-    }
-  }
-
-  /** @internal */
-  private _insertEl(el: Element) {
-    if (this.replaceContents && !this.prepend) {
-      this._el.nativeElement.innerHTML = '';
-    }
-
-    if (this.prepend) {
-      this._el.nativeElement.insertBefore(el, this._el.nativeElement.firstChild);
-    } else {
-      this._el.nativeElement.appendChild(el);
     }
   }
 
@@ -194,12 +205,12 @@ export class InlineSVGDirective implements OnInit, OnChanges {
   }
 
   /** @internal */
-  private _checkSVGSupport() {
-    return typeof SVGRect !== 'undefined';
+  private _isBrowser(): boolean {
+    return typeof window !== 'undefined';
   }
 
   /** @internal */
-  private _isBrowser(): boolean {
-    return typeof window !== 'undefined';
+  private _checkSVGSupport() {
+    return typeof SVGRect !== 'undefined';
   }
 }
