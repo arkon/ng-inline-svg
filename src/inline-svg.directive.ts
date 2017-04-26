@@ -42,6 +42,9 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   /** @internal */
   private _subscription: Subscription;
 
+  /** @internal */
+  private _prevSVG: SVGElement;
+
   constructor(
     private _el: ElementRef,
     private _svgCache: SVGCacheService) {
@@ -137,6 +140,10 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   /** @internal */
   private _insertEl(el: Element) {
     if (this.replaceContents && !this.prepend) {
+      if (this._prevSVG) {
+        this._prevSVG.remove();
+      }
+
       this._el.nativeElement.innerHTML = '';
     }
 
@@ -144,6 +151,10 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
       this._el.nativeElement.insertBefore(el, this._el.nativeElement.firstChild);
     } else {
       this._el.nativeElement.appendChild(el);
+    }
+
+    if (el.nodeName === 'svg') {
+      this._prevSVG = el as SVGElement;
     }
   }
 
