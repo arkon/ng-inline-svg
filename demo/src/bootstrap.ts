@@ -5,6 +5,8 @@ import { InlineSVGModule } from 'ng-inline-svg';
 
 import { DemoComponent } from './demo/demo.component';
 
+import './styles/styles.scss';
+
 enableProdMode();
 
 @NgModule({
