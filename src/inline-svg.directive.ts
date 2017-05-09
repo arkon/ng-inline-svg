@@ -140,8 +140,9 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   /** @internal */
   private _insertEl(el: Element) {
     if (this.replaceContents && !this.prepend) {
-      if (this._prevSVG) {
-        this._prevSVG.remove();
+      const parentNode = this._prevSVG && this._prevSVG.parentNode;
+      if (parentNode) {
+        parentNode.removeChild(this._prevSVG);
       }
 
       this._el.nativeElement.innerHTML = '';
