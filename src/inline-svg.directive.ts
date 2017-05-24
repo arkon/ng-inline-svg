@@ -1,4 +1,6 @@
 import {
+  ComponentFactoryResolver,
+  ComponentRef,
   Directive,
   ElementRef,
   EventEmitter,
@@ -7,11 +9,14 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges
+  SimpleChanges,
+  ViewContainerRef
 } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
+import { InlineSVGComponent } from './inline-svg.component';
 import { SVGCacheService } from './svg-cache.service';
+import { isBrowser, checkSVGSupport, insertEl } from './utils';
 
 @Directive({
   selector: '[inlineSVG]',
@@ -26,9 +31,13 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   @Input() forceEvalStyles: boolean = false;
   @Input() evalScripts: 'always' | 'once' | 'never' = 'always';
   @Input() fallbackImgUrl: string;
+  @Input() injectComponent: boolean = false;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
   @Output() onSVGFailed: EventEmitter<any> = new EventEmitter<any>();
+
+  /** @internal */
+  _prevSVG: SVGElement;
 
   /** @internal */
   private _prevUrl: string;
@@ -43,21 +52,23 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   private _subscription: Subscription;
 
   /** @internal */
-  private _prevSVG: SVGElement;
+  private _svgComp: ComponentRef<InlineSVGComponent>;
 
   constructor(
     private _el: ElementRef,
+    private _viewContainerRef: ViewContainerRef,
+    private _resolver: ComponentFactoryResolver,
     private _svgCache: SVGCacheService) {
   }
 
   ngOnInit(): void {
-    if (!this._isBrowser()) { return; }
+    if (!isBrowser()) { return; }
 
     this._insertSVG();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!this._isBrowser()) { return; }
+    if (!isBrowser()) { return; }
 
     if (changes['inlineSVG']) {
       this._insertSVG();
@@ -72,12 +83,10 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
   /** @internal */
   private _insertSVG(): void {
-    if (!this._supportsSVG) {
-      return;
-    }
+    if (!this._supportsSVG) { return; }
 
     // Check if the browser supports embed SVGs
-    if (!this._checkSVGSupport()) {
+    if (!checkSVGSupport()) {
       this._fail('Embed SVG not supported by browser');
       this._supportsSVG = false;
       return;
@@ -109,26 +118,26 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
       this._subscription = this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
         .subscribe(
           (svg: SVGElement) => {
+            if (!svg) { return; }
+
             // Insert SVG
-            if (svg && this._el.nativeElement) {
-              if (this.removeSVGAttributes) {
-                this._removeAttributes(svg, this.removeSVGAttributes);
-              }
-
-              this._insertEl(svg);
-
-              // Script evaluation
-              this._evalScripts(svg, this.inlineSVG);
-
-              // Force evaluation of <style> tags since IE doesn't do it.
-              // Reference: https://github.com/arkon/ng-inline-svg/issues/17
-              if (this.forceEvalStyles) {
-                const styleTags = svg.querySelectorAll('style');
-                Array.prototype.forEach.call(styleTags, tag => tag.textContent += '');
-              }
-
-              this.onSVGInserted.emit(svg);
+            if (this.removeSVGAttributes) {
+              this._removeAttributes(svg, this.removeSVGAttributes);
             }
+
+            this._insertEl(svg);
+
+            // Script evaluation
+            this._evalScripts(svg, this.inlineSVG);
+
+            // Force evaluation of <style> tags since IE doesn't do it.
+            // Reference: https://github.com/arkon/ng-inline-svg/issues/17
+            if (this.forceEvalStyles) {
+              const styleTags = svg.querySelectorAll('style');
+              Array.prototype.forEach.call(styleTags, tag => tag.textContent += '');
+            }
+
+            this.onSVGInserted.emit(svg);
           },
           (err: any) => {
             this._fail(err);
@@ -139,23 +148,18 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
   /** @internal */
   private _insertEl(el: Element) {
-    if (this.replaceContents && !this.prepend) {
-      const parentNode = this._prevSVG && this._prevSVG.parentNode;
-      if (parentNode) {
-        parentNode.removeChild(this._prevSVG);
+    if (this.injectComponent) {
+      if (!this._svgComp) {
+        const factory = this._resolver.resolveComponentFactory(InlineSVGComponent);
+        this._svgComp = this._viewContainerRef.createComponent(factory);
       }
 
-      this._el.nativeElement.innerHTML = '';
-    }
-
-    if (this.prepend) {
-      this._el.nativeElement.insertBefore(el, this._el.nativeElement.firstChild);
+      this._svgComp.instance.context = this;
+      this._svgComp.instance.replaceContents = this.replaceContents;
+      this._svgComp.instance.prepend = this.prepend;
+      this._svgComp.instance.content = el;
     } else {
-      this._el.nativeElement.appendChild(el);
-    }
-
-    if (el.nodeName === 'svg') {
-      this._prevSVG = el as SVGElement;
+      insertEl(this, this._el.nativeElement, el, this.replaceContents, this.prepend);
     }
   }
 
@@ -214,15 +218,5 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
       this._insertEl(elImg);
     }
-  }
-
-  /** @internal */
-  private _isBrowser(): boolean {
-    return typeof window !== 'undefined';
-  }
-
-  /** @internal */
-  private _checkSVGSupport() {
-    return typeof SVGRect !== 'undefined';
   }
 }
