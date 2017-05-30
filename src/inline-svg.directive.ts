@@ -4,19 +4,22 @@ import {
   Directive,
   ElementRef,
   EventEmitter,
+  Inject,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  PLATFORM_ID,
   SimpleChanges,
   ViewContainerRef
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Subscription } from 'rxjs/Subscription';
 
 import { InlineSVGComponent } from './inline-svg.component';
 import { SVGCacheService } from './svg-cache.service';
-import { isBrowser, checkSVGSupport, insertEl } from './utils';
+import { checkSVGSupport, insertEl } from './utils';
 
 @Directive({
   selector: '[inlineSVG]',
@@ -39,9 +42,10 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   /** @internal */
   _prevSVG: SVGElement;
 
-  private _prevUrl: string;
+  private _isBrowser: boolean;
+  private _supportsSVG: boolean;
 
-  private _supportsSVG: boolean = true;
+  private _prevUrl: string;
 
   private _ranScripts: { [url: string]: boolean } = {};
 
@@ -53,17 +57,25 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     private _el: ElementRef,
     private _viewContainerRef: ViewContainerRef,
     private _resolver: ComponentFactoryResolver,
-    private _svgCache: SVGCacheService) {
+    private _svgCache: SVGCacheService,
+    @Inject(PLATFORM_ID) platformId: Object) {
+    this._isBrowser = isPlatformBrowser(platformId);
+    this._supportsSVG = checkSVGSupport();
+
+    // Check if the browser supports embed SVGs
+    if (!this._supportsSVG) {
+      this._fail('Embed SVG not supported by browser');
+    }
   }
 
   ngOnInit(): void {
-    if (!isBrowser()) { return; }
+    if (!this._isBrowser) { return; }
 
     this._insertSVG();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!isBrowser()) { return; }
+    if (!this._isBrowser) { return; }
 
     if (changes['inlineSVG']) {
       this._insertSVG();
@@ -78,13 +90,6 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
   private _insertSVG(): void {
     if (!this._supportsSVG) { return; }
-
-    // Check if the browser supports embed SVGs
-    if (!checkSVGSupport()) {
-      this._fail('Embed SVG not supported by browser');
-      this._supportsSVG = false;
-      return;
-    }
 
     // Check if a URL was actually passed into the directive
     if (!this.inlineSVG) {
