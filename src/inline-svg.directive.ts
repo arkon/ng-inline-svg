@@ -39,19 +39,14 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   /** @internal */
   _prevSVG: SVGElement;
 
-  /** @internal */
   private _prevUrl: string;
 
-  /** @internal */
   private _supportsSVG: boolean = true;
 
-  /** @internal */
   private _ranScripts: { [url: string]: boolean } = {};
 
-  /** @internal */
   private _subscription: Subscription;
 
-  /** @internal */
   private _svgComp: ComponentRef<InlineSVGComponent>;
 
   constructor(
@@ -81,7 +76,6 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  /** @internal */
   private _insertSVG(): void {
     if (!this._supportsSVG) { return; }
 
@@ -146,7 +140,6 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  /** @internal */
   private _insertEl(el: Element) {
     if (this.injectComponent) {
       if (!this._svgComp) {
@@ -163,7 +156,6 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  /** @internal */
   private _removeAttributes(svg: SVGElement, attrs: Array<string>) {
     const innerEls = svg.getElementsByTagName('*');
 
@@ -179,7 +171,6 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   }
 
   // Based off code from https://github.com/iconic/SVGInjector
-  /** @internal */
   private _evalScripts(svg: SVGElement, url: string) {
     const scripts = svg.querySelectorAll('script');
     const scriptsToEval = [];
@@ -207,7 +198,6 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  /** @internal */
   private _fail(msg: string) {
     this.onSVGFailed.emit(msg);
 

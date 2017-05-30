@@ -13,13 +13,9 @@ export class InlineSVGConfig {
 
 @Injectable()
 export class SVGCacheService {
-  /** @internal */
   private static _cache: Map<string, SVGElement>;
-
-  /** @internal */
   private static _inProgressReqs: Map<string, Observable<SVGElement>>;
 
-  /** @internal */
   private _baseUrl: string;
 
   constructor(
@@ -70,7 +66,6 @@ export class SVGCacheService {
     return req;
   }
 
-  /** @internal */
   private _getAbsoluteUrl(url: string): string {
     // Prepend user-configured base if present
     if (this._baseUrl) {
@@ -83,7 +78,6 @@ export class SVGCacheService {
     return base.href;
   }
 
-  /** @internal */
   private _svgElementFromString(str: string): SVGElement | never {
     const div: HTMLElement = document.createElement('DIV');
     div.innerHTML = str;
@@ -97,7 +91,6 @@ export class SVGCacheService {
     return svg;
   }
 
-  /** @internal */
   private _cloneSVG(svg: SVGElement): SVGElement {
     return svg.cloneNode(true) as SVGElement;
   }
