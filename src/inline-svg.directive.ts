@@ -1,6 +1,6 @@
 import {
-  ComponentFactoryResolver,
-  ComponentRef,
+  // ComponentFactoryResolver,
+  // ComponentRef,
   Directive,
   ElementRef,
   EventEmitter,
@@ -12,12 +12,12 @@ import {
   Output,
   PLATFORM_ID,
   SimpleChanges,
-  ViewContainerRef
+  // ViewContainerRef
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Subscription } from 'rxjs/Subscription';
 
-import { InlineSVGComponent } from './inline-svg.component';
+// import { InlineSVGComponent } from './inline-svg.component';
 import { SVGCacheService } from './svg-cache.service';
 import { checkSVGSupport, insertEl } from './utils';
 
@@ -34,7 +34,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   @Input() forceEvalStyles: boolean = false;
   @Input() evalScripts: 'always' | 'once' | 'never' = 'always';
   @Input() fallbackImgUrl: string;
-  @Input() injectComponent: boolean = false;
+  // @Input() injectComponent: boolean = false;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
   @Output() onSVGFailed: EventEmitter<any> = new EventEmitter<any>();
@@ -51,12 +51,12 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
   private _subscription: Subscription;
 
-  private _svgComp: ComponentRef<InlineSVGComponent>;
+  // private _svgComp: ComponentRef<InlineSVGComponent>;
 
   constructor(
     private _el: ElementRef,
-    private _viewContainerRef: ViewContainerRef,
-    private _resolver: ComponentFactoryResolver,
+    // private _viewContainerRef: ViewContainerRef,
+    // private _resolver: ComponentFactoryResolver,
     private _svgCache: SVGCacheService,
     @Inject(PLATFORM_ID) platformId: Object) {
     this._isBrowser = isPlatformBrowser(platformId);
@@ -146,19 +146,22 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   }
 
   private _insertEl(el: Element) {
-    if (this.injectComponent) {
-      if (!this._svgComp) {
-        const factory = this._resolver.resolveComponentFactory(InlineSVGComponent);
-        this._svgComp = this._viewContainerRef.createComponent(factory);
-      }
+    // if (this.injectComponent) {
+    //   // TODO: inject INTO div instead of beside it?
+    //   // https://stackoverflow.com/questions/38093727/
+    //   //   angular2-insert-a-dynamic-component-as-child-of-a-container-in-the-dom
+    //   if (!this._svgComp) {
+    //     const factory = this._resolver.resolveComponentFactory(InlineSVGComponent);
+    //     this._svgComp = this._viewContainerRef.createComponent(factory);
+    //   }
 
-      this._svgComp.instance.context = this;
-      this._svgComp.instance.replaceContents = this.replaceContents;
-      this._svgComp.instance.prepend = this.prepend;
-      this._svgComp.instance.content = el;
-    } else {
+    //   this._svgComp.instance.context = this;
+    //   this._svgComp.instance.replaceContents = this.replaceContents;
+    //   this._svgComp.instance.prepend = this.prepend;
+    //   this._svgComp.instance.content = el;
+    // } else {
       insertEl(this, this._el.nativeElement, el, this.replaceContents, this.prepend);
-    }
+    // }
   }
 
   private _removeAttributes(svg: SVGElement, attrs: Array<string>) {
