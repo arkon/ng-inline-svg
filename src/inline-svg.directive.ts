@@ -4,22 +4,19 @@ import {
   Directive,
   ElementRef,
   EventEmitter,
-  Inject,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
   Output,
-  PLATFORM_ID,
   SimpleChanges,
   // ViewContainerRef
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { Subscription } from 'rxjs/Subscription';
 
 // import { InlineSVGComponent } from './inline-svg.component';
 import { SVGCacheService } from './svg-cache.service';
-import { checkSVGSupport, insertEl } from './utils';
+import { checkSVGSupport, insertEl, isBrowser } from './utils';
 
 @Directive({
   selector: '[inlineSVG]',
@@ -57,9 +54,8 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     private _el: ElementRef,
     // private _viewContainerRef: ViewContainerRef,
     // private _resolver: ComponentFactoryResolver,
-    private _svgCache: SVGCacheService,
-    @Inject(PLATFORM_ID) platformId: Object) {
-    this._isBrowser = isPlatformBrowser(platformId);
+    private _svgCache: SVGCacheService) {
+    this._isBrowser = isBrowser();
     this._supportsSVG = checkSVGSupport();
 
     // Check if the browser supports embed SVGs

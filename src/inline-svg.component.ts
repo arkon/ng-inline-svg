@@ -22,8 +22,7 @@ export class InlineSVGComponent implements AfterViewInit, OnChanges {
   @Input() replaceContents: boolean;
   @Input() prepend: boolean;
 
-  constructor(private _el: ElementRef) {
-  }
+  constructor(private _el: ElementRef) {}
 
   ngAfterViewInit(): void {
     this._updateContent();
