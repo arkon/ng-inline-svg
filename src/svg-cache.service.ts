@@ -16,13 +16,13 @@ export class SVGCacheService {
   private static _cache: Map<string, SVGElement>;
   private static _inProgressReqs: Map<string, Observable<SVGElement>>;
 
-  private _baseUrl: string;
+  private static _baseUrl: string;
 
   constructor(
     @Optional() config: InlineSVGConfig,
     private _http: Http) {
-    if (config) {
-      this._baseUrl = config.baseUrl;
+    if (!SVGCacheService._baseUrl) {
+      this.setBaseUrl(config);
     }
 
     if (!SVGCacheService._cache) {
@@ -66,10 +66,16 @@ export class SVGCacheService {
     return req;
   }
 
+  setBaseUrl(config: InlineSVGConfig) {
+    if (config) {
+      SVGCacheService._baseUrl = config.baseUrl;
+    }
+  }
+
   private _getAbsoluteUrl(url: string): string {
     // Prepend user-configured base if present
-    if (this._baseUrl) {
-      url = this._baseUrl + url;
+    if (SVGCacheService._baseUrl) {
+      url = SVGCacheService._baseUrl + url;
     }
 
     const base = document.createElement('BASE') as HTMLBaseElement;
