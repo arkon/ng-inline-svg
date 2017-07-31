@@ -1,5 +1,5 @@
 import { Injectable, Optional } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/catch';
@@ -20,7 +20,7 @@ export class SVGCacheService {
 
   constructor(
     @Optional() config: InlineSVGConfig,
-    private _http: Http) {
+    private _http: HttpClient) {
     if (!SVGCacheService._baseUrl) {
       this.setBaseUrl(config);
     }
@@ -48,8 +48,7 @@ export class SVGCacheService {
     }
 
     // Otherwise, make the HTTP call to fetch
-    const req = this._http.get(absUrl)
-      .map((res: Response) => res.text())
+    const req = this._http.get(absUrl, {responseType: 'text'})
       .catch((err: any) => err)
       .finally(() => {
         SVGCacheService._inProgressReqs.delete(absUrl);
