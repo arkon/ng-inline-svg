@@ -20,6 +20,8 @@ font icons.
 npm install --save ng-inline-svg
 ```
 
+**IMPORTANT**: If you're using a version of Angular prior to v4.3.0, you must use ng-inline-svg v3.4.0 or earlier.
+
 
 ## Usage
 
