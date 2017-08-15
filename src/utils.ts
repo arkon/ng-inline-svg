@@ -4,8 +4,9 @@ export function checkSVGSupport() {
   return typeof SVGRect !== 'undefined';
 }
 
-export function insertEl(
-  dir: InlineSVGDirective, parentEl: HTMLElement, content: Element, replaceContents: boolean, prepend: boolean) {
+export function insertEl(dir: InlineSVGDirective, parentEl: HTMLElement,
+                         content: Element, replaceContents: boolean,
+                         prepend: boolean) {
   if (replaceContents && !prepend) {
     const parentNode = dir._prevSVG && dir._prevSVG.parentNode;
     if (parentNode) {

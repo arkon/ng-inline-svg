@@ -1,6 +1,6 @@
 import {
-  // ComponentFactoryResolver,
-  // ComponentRef,
+  ComponentFactoryResolver,
+  ComponentRef,
   Directive,
   ElementRef,
   EventEmitter,
@@ -10,11 +10,11 @@ import {
   OnInit,
   Output,
   SimpleChanges,
-  // ViewContainerRef
+  ViewContainerRef
 } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
-// import { InlineSVGComponent } from './inline-svg.component';
+import { InlineSVGComponent } from './inline-svg.component';
 import { SVGCacheService } from './svg-cache.service';
 import { checkSVGSupport, insertEl, isBrowser } from './utils';
 
@@ -26,12 +26,12 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   @Input() inlineSVG: string;
   @Input() replaceContents: boolean = true;
   @Input() prepend: boolean = false;
+  @Input() injectComponent: boolean = false;
   @Input() cacheSVG: boolean = true;
   @Input() removeSVGAttributes: Array<string>;
   @Input() forceEvalStyles: boolean = false;
   @Input() evalScripts: 'always' | 'once' | 'never' = 'always';
   @Input() fallbackImgUrl: string;
-  // @Input() injectComponent: boolean = false;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
   @Output() onSVGFailed: EventEmitter<any> = new EventEmitter<any>();
@@ -48,12 +48,12 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
   private _subscription: Subscription;
 
-  // private _svgComp: ComponentRef<InlineSVGComponent>;
+  private _svgComp: ComponentRef<InlineSVGComponent>;
 
   constructor(
     private _el: ElementRef,
-    // private _viewContainerRef: ViewContainerRef,
-    // private _resolver: ComponentFactoryResolver,
+    private _viewContainerRef: ViewContainerRef,
+    private _resolver: ComponentFactoryResolver,
     private _svgCache: SVGCacheService) {
     this._isBrowser = isBrowser();
     this._supportsSVG = checkSVGSupport();
@@ -142,22 +142,24 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   }
 
   private _insertEl(el: Element) {
-    // if (this.injectComponent) {
-    //   // TODO: inject INTO div instead of beside it?
-    //   // https://stackoverflow.com/questions/38093727/
-    //   //   angular2-insert-a-dynamic-component-as-child-of-a-container-in-the-dom
-    //   if (!this._svgComp) {
-    //     const factory = this._resolver.resolveComponentFactory(InlineSVGComponent);
-    //     this._svgComp = this._viewContainerRef.createComponent(factory);
-    //   }
+    if (this.injectComponent) {
+      if (!this._svgComp) {
+        const factory = this._resolver.resolveComponentFactory(InlineSVGComponent);
+        this._svgComp = this._viewContainerRef.createComponent(factory);
+      }
 
-    //   this._svgComp.instance.context = this;
-    //   this._svgComp.instance.replaceContents = this.replaceContents;
-    //   this._svgComp.instance.prepend = this.prepend;
-    //   this._svgComp.instance.content = el;
-    // } else {
+      this._svgComp.instance.context = this;
+      this._svgComp.instance.replaceContents = this.replaceContents;
+      this._svgComp.instance.prepend = this.prepend;
+      this._svgComp.instance.content = el;
+
+      // Force element to be inside the directive element inside of adjacent
+      this._el.nativeElement.appendChild(
+        this._svgComp.injector.get(InlineSVGComponent)._el.nativeElement
+      );
+    } else {
       insertEl(this, this._el.nativeElement, el, this.replaceContents, this.prepend);
-    // }
+    }
   }
 
   private _removeAttributes(svg: SVGElement, attrs: Array<string>) {
