@@ -38,14 +38,13 @@
   },
   "peerDependencies": {
     "@angular/core": ">=4.3.0",
-    "@angular/http": ">=4.3.0"
+    "@angular/common": ">=4.3.0"
   },
   "devDependencies": {
     "@angular/common": "^4.3.4",
     "@angular/compiler": "^4.3.4",
     "@angular/compiler-cli": "^4.3.4",
     "@angular/core": "^4.3.4",
-    "@angular/http": "^4.3.4",
     "@angular/platform-browser": "^4.3.4",
     "rimraf": "^2.6.1",
     "rxjs": "^5.4.3",
