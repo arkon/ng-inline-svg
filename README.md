@@ -6,7 +6,7 @@
 
 *Formerly called [ng2-inline-svg](https://github.com/arkon/ng2-inline-svg)*
 
-Angular directive for inserting an SVG inline within an element, allowing for easily styling
+Angular 4+ directive for inserting an SVG inline within an element, allowing for easily styling
 with CSS like `fill: currentColor;`.
 
 This is based on [md-icon](https://github.com/angular/material2/tree/master/src/lib/icon),
