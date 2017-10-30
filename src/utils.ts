@@ -26,13 +26,3 @@ export function insertEl(dir: InlineSVGDirective, parentEl: HTMLElement,
     dir._prevSVG = content as SVGElement;
   }
 }
-
-/**
- * Detects whether or not we are running in a browser context or not.
- * From https://stackoverflow.com/a/31090240
- *
- * @return {boolean} Whether this is a browser or a server.
- */
-export function isBrowser(): boolean {
-  return new Function('try{return this===window;}catch(e){return false;}')();
-}
