@@ -1,4 +1,5 @@
 import { NgModule, enableProdMode } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { InlineSVGModule } from 'ng-inline-svg';
@@ -11,7 +12,7 @@ enableProdMode();
 
 @NgModule({
   declarations: [DemoComponent],
-  imports: [BrowserModule, InlineSVGModule],
+  imports: [BrowserModule, HttpClientModule, InlineSVGModule],
   bootstrap: [DemoComponent]
 })
 class DemoAppModule {}

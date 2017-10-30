@@ -25,14 +25,15 @@ npm install --save ng-inline-svg
 
 ## Usage
 
-Add `InlineSVGModule` to your list of module imports:
+Add `HttpClientModule` and `InlineSVGModule` to your list of module imports:
 
 ```typescript
+import { HttpClientModule } from '@angular/common/http';
 import { InlineSVGModule } from 'ng-inline-svg';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, InlineSVGModule],
+  imports: [BrowserModule, HttpClientModule, InlineSVGModule],
   bootstrap: [AppComponent]
 })
 class AppModule {}
