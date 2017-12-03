@@ -1,13 +1,16 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
-
+import { InlineSVGConfig, InlineSVGDefaultConfig } from './inline-svg.config';
 import { InlineSVGComponent } from './inline-svg.component';
 import { InlineSVGDirective } from './inline-svg.directive';
-import { InlineSVGConfig, SVGCacheService } from './svg-cache.service';
+import { SVGCacheService } from './svg-cache.service';
 
 @NgModule({
   declarations: [InlineSVGDirective, InlineSVGComponent],
   exports: [InlineSVGDirective],
-  providers: [SVGCacheService],
+  providers: [
+    SVGCacheService,
+    {provide: InlineSVGConfig, useClass: InlineSVGDefaultConfig},
+  ],
   entryComponents: [InlineSVGComponent]
 })
 export class InlineSVGModule {
