@@ -80,7 +80,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this._subscription) {
       this._subscription.unsubscribe();
     }
@@ -128,10 +128,10 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
             this._evalScripts(svg, this.inlineSVG);
 
             // Force evaluation of <style> tags since IE doesn't do it.
-            // Reference: https://github.com/arkon/ng-inline-svg/issues/17
+            // See https://github.com/arkon/ng-inline-svg/issues/17
             if (this.forceEvalStyles) {
               const styleTags = svg.querySelectorAll('style');
-              Array.prototype.forEach.call(styleTags, tag => tag.textContent += '');
+              Array.from(styleTags).forEach(tag => tag.textContent += '');
             }
 
             this.onSVGInserted.emit(svg);
@@ -143,7 +143,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private _insertEl(el: Element) {
+  private _insertEl(el: Element): void {
     if (this.injectComponent) {
       if (!this._svgComp) {
         const factory = this._resolver.resolveComponentFactory(InlineSVGComponent);
@@ -164,7 +164,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private _removeAttributes(svg: SVGElement, attrs: Array<string>) {
+  private _removeAttributes(svg: SVGElement, attrs: Array<string>): void {
     const innerEls = svg.getElementsByTagName('*');
 
     for (let i = 0; i < innerEls.length; i++) {
@@ -178,8 +178,8 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  // Based off code from https://github.com/iconic/SVGInjector
-  private _evalScripts(svg: SVGElement, url: string) {
+  // Based off of code from https://github.com/iconic/SVGInjector
+  private _evalScripts(svg: SVGElement, url: string): void {
     const scripts = svg.querySelectorAll('script');
     const scriptsToEval = [];
     let script, scriptType;
@@ -206,7 +206,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private _fail(msg: string) {
+  private _fail(msg: string): void {
     this.onSVGFailed.emit(msg);
 
     // Insert fallback image, if specified

@@ -65,7 +65,7 @@ export class SVGCacheService {
     return req;
   }
 
-  setBaseUrl(config: InlineSVGConfig) {
+  setBaseUrl(config: InlineSVGConfig): void {
     if (config) {
       SVGCacheService._baseUrl = config.baseUrl;
     }

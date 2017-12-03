@@ -1,12 +1,16 @@
 import { InlineSVGDirective } from './inline-svg.directive';
 
-export function checkSVGSupport() {
+export function checkSVGSupport(): boolean {
   return typeof SVGRect !== 'undefined';
 }
 
-export function insertEl(dir: InlineSVGDirective, parentEl: HTMLElement,
-                         content: Element, replaceContents: boolean,
-                         prepend: boolean) {
+export function insertEl(
+  dir: InlineSVGDirective,
+  parentEl: HTMLElement,
+  content: Element,
+  replaceContents: boolean,
+  prepend: boolean
+): void {
   if (replaceContents && !prepend) {
     const parentNode = dir._prevSVG && dir._prevSVG.parentNode;
     if (parentNode) {

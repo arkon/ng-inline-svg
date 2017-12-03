@@ -19,6 +19,7 @@
   "compileOnSave": false,
   "buildOnSave": false,
   "angularCompilerOptions": {
-    "skipTemplateCodegen": true
+    "skipTemplateCodegen": true,
+    "preserveWhitespaces": false
   }
 }
