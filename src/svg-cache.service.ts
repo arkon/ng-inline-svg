@@ -6,23 +6,20 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/finally';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
-
-export class InlineSVGConfig {
-  baseUrl: string;
-}
+import { InlineSVGConfig } from './inline-svg.config';
 
 @Injectable()
 export class SVGCacheService {
   private static _cache: Map<string, SVGElement>;
   private static _inProgressReqs: Map<string, Observable<SVGElement>>;
 
-  private static _baseUrl: string;
+  private _baseUrl: string;
 
   constructor(
     @Optional() config: InlineSVGConfig,
     private _http: HttpClient) {
-    if (!SVGCacheService._baseUrl) {
-      this.setBaseUrl(config);
+    if (config) {
+      this._baseUrl = config.baseUrl;
     }
 
     if (!SVGCacheService._cache) {
@@ -65,16 +62,10 @@ export class SVGCacheService {
     return req;
   }
 
-  setBaseUrl(config: InlineSVGConfig): void {
-    if (config) {
-      SVGCacheService._baseUrl = config.baseUrl;
-    }
-  }
-
   private _getAbsoluteUrl(url: string): string {
     // Prepend user-configured base if present
-    if (SVGCacheService._baseUrl) {
-      url = SVGCacheService._baseUrl + url;
+    if (this._baseUrl) {
+      url = this._baseUrl + url;
     }
 
     const base = document.createElement('BASE') as HTMLBaseElement;
