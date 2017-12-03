@@ -8,9 +8,9 @@ export class InlineSVGConfig {
 export class InlineSVGDefaultConfig extends InlineSVGConfig {
     constructor(
         @Optional() @Inject(APP_BASE_HREF) appBase: string,
-        @Optional() location: PlatformLocation,
-    ) {
+        @Optional() location: PlatformLocation) {
         super();
+
         if (appBase !== null) {
             this.baseUrl = appBase;
         } else if (location !== null) {

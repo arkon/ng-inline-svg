@@ -6,6 +6,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/finally';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
+
 import { InlineSVGConfig } from './inline-svg.config';
 
 @Injectable()

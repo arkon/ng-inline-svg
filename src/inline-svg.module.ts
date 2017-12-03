@@ -1,6 +1,7 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
-import { InlineSVGConfig, InlineSVGDefaultConfig } from './inline-svg.config';
+
 import { InlineSVGComponent } from './inline-svg.component';
+import { InlineSVGConfig, InlineSVGDefaultConfig } from './inline-svg.config';
 import { InlineSVGDirective } from './inline-svg.directive';
 import { SVGCacheService } from './svg-cache.service';
 
@@ -9,7 +10,7 @@ import { SVGCacheService } from './svg-cache.service';
   exports: [InlineSVGDirective],
   providers: [
     SVGCacheService,
-    {provide: InlineSVGConfig, useClass: InlineSVGDefaultConfig},
+    { provide: InlineSVGConfig, useClass: InlineSVGDefaultConfig },
   ],
   entryComponents: [InlineSVGComponent]
 })
