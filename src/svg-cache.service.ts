@@ -64,8 +64,8 @@ export class SVGCacheService {
   }
 
   private _getAbsoluteUrl(url: string): string {
-    // Prepend user-configured base if present
-    if (this._baseUrl) {
+    // Prepend user-configured base if present and URL doesn't seem to have its own
+    if (this._baseUrl && !/^https?:\/\//i.test(url)) {
       url = this._baseUrl + url;
     }
 
