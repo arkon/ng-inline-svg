@@ -67,6 +67,12 @@ export class SVGCacheService {
     // Prepend user-configured base if present and URL doesn't seem to have its own
     if (this._baseUrl && !/^https?:\/\//i.test(url)) {
       url = this._baseUrl + url;
+
+      // Convert leading "//" to "/" to prevent a malformed URL
+      // See https://github.com/arkon/ng-inline-svg/issues/50
+      if (url.indexOf('//') === 0) {
+        url = url.substring(1);
+      }
     }
 
     const base = document.createElement('BASE') as HTMLBaseElement;
