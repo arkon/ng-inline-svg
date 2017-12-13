@@ -14,13 +14,13 @@ export class SVGCacheService {
   private static _cache: Map<string, SVGElement>;
   private static _inProgressReqs: Map<string, Observable<SVGElement>>;
 
-  private _baseUrl: string;
+  private static _baseUrl: string;
 
   constructor(
     @Optional() config: InlineSVGConfig,
     private _http: HttpClient) {
-    if (config) {
-      this._baseUrl = config.baseUrl;
+    if (config && !SVGCacheService._baseUrl) {
+      SVGCacheService._baseUrl = config.baseUrl;
     }
 
     if (!SVGCacheService._cache) {
@@ -65,8 +65,8 @@ export class SVGCacheService {
 
   private _getAbsoluteUrl(url: string): string {
     // Prepend user-configured base if present and URL doesn't seem to have its own
-    if (this._baseUrl && !/^https?:\/\//i.test(url)) {
-      url = this._baseUrl + url;
+    if (SVGCacheService._baseUrl && !/^https?:\/\//i.test(url)) {
+      url = SVGCacheService._baseUrl + url;
 
       // Convert leading "//" to "/" to prevent a malformed URL
       // See https://github.com/arkon/ng-inline-svg/issues/50
