@@ -20,7 +20,7 @@ export class SVGCacheService {
     @Optional() config: InlineSVGConfig,
     private _http: HttpClient) {
     if (config && !SVGCacheService._baseUrl) {
-      SVGCacheService._baseUrl = config.baseUrl;
+      this.setBaseUrl(config);
     }
 
     if (!SVGCacheService._cache) {
@@ -61,6 +61,12 @@ export class SVGCacheService {
     SVGCacheService._inProgressReqs.set(absUrl, req);
 
     return req;
+  }
+
+  setBaseUrl(config: InlineSVGConfig): void {
+    if (config) {
+      SVGCacheService._baseUrl = config.baseUrl;
+    }
   }
 
   private _getAbsoluteUrl(url: string): string {
