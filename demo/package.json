@@ -24,7 +24,7 @@
     "@angular/platform-browser": "^5.0.5",
     "@angular/platform-browser-dynamic": "^5.0.5",
     "es6-shim": "^0.35.3",
-    "ng-inline-svg": "file:../",
+    "ng-inline-svg": "file:..",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.5.3",
     "zone.js": "^0.8.18"
