@@ -33,7 +33,7 @@ export class SVGCacheService {
   }
 
   getSVG(url: string, cache: boolean = true): Observable<SVGElement> {
-    const absUrl = this._getAbsoluteUrl(url);
+    const absUrl = this.getAbsoluteUrl(url);
 
     // Return cached copy if it exists
     if (cache && SVGCacheService._cache.has(absUrl)) {
@@ -69,7 +69,7 @@ export class SVGCacheService {
     }
   }
 
-  private _getAbsoluteUrl(url: string): string {
+  getAbsoluteUrl(url: string): string {
     // Prepend user-configured base if present and URL doesn't seem to have its own
     if (SVGCacheService._baseUrl && !/^https?:\/\//i.test(url)) {
       url = SVGCacheService._baseUrl + url;
