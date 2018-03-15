@@ -11,15 +11,17 @@ import {
   OnInit,
   Output,
   PLATFORM_ID,
+  Renderer2,
   SimpleChanges,
   ViewContainerRef,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { Subscription } from 'rxjs/Subscription';
 
 import { InlineSVGComponent } from './inline-svg.component';
 import { SVGCacheService } from './svg-cache.service';
-import { checkSVGSupport, insertEl } from './utils';
+import { checkSVGSupport } from './utils';
+import { InlineSVGService } from './inline-svg.service';
 
 @Directive({
   selector: '[inlineSVG]',
@@ -57,6 +59,8 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     private _viewContainerRef: ViewContainerRef,
     private _resolver: ComponentFactoryResolver,
     private _svgCache: SVGCacheService,
+    private _renderer: Renderer2,
+    private _inlineSVGService: InlineSVGService,
     @Inject(PLATFORM_ID) private platformId: Object) {
     this._supportsSVG = checkSVGSupport();
 
@@ -67,14 +71,12 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (!isPlatformBrowser(this.platformId)) { return; }
-
+    if (!isPlatformBrowser(this.platformId) && !isPlatformServer(this.platformId)) { return; }
     this._insertSVG();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!isPlatformBrowser(this.platformId)) { return; }
-
+    if (!isPlatformBrowser(this.platformId) && !isPlatformServer(this.platformId)) { return; }
     if (changes['inlineSVG']) {
       this._insertSVG();
     }
@@ -97,11 +99,11 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
     // Support for symbol IDs
     if (this.inlineSVG.charAt(0) === '#' || this.inlineSVG.indexOf('.svg#') > -1) {
-      const elSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const elSvgUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      const elSvg = this._renderer.createElement('svg', 'http://www.w3.org/2000/svg');
+      const elSvgUse = this._renderer.createElement('use', 'http://www.w3.org/2000/svg');
       const absUrl = this._svgCache.getAbsoluteUrl(this.inlineSVG);
-      elSvgUse.setAttributeNS('http://www.w3.org/1999/xlink', 'href', absUrl);
-      elSvg.appendChild(elSvgUse);
+      this._renderer.setAttribute(elSvgUse, 'href', absUrl, 'http://www.w3.org/1999/xlink');
+      this._renderer.appendChild(elSvg, elSvgUse);
 
       this._insertEl(elSvg);
 
@@ -157,15 +159,17 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
       this._svgComp.instance.content = el;
 
       // Force element to be inside the directive element inside of adjacent
-      this._el.nativeElement.appendChild(
+      this._renderer.appendChild(
+        this._el.nativeElement,
         this._svgComp.injector.get(InlineSVGComponent)._el.nativeElement
       );
     } else {
-      insertEl(this, this._el.nativeElement, el, this.replaceContents, this.prepend);
+      this._inlineSVGService.insertEl(this, this._el.nativeElement, el, this.replaceContents, this.prepend);
     }
   }
 
   private _removeAttributes(svg: SVGElement, attrs: Array<string>): void {
+    if (!isPlatformBrowser(this.platformId)) { return; }
     const innerEls = svg.getElementsByTagName('*');
 
     for (let i = 0; i < innerEls.length; i++) {
@@ -181,6 +185,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
   // Based off of code from https://github.com/iconic/SVGInjector
   private _evalScripts(svg: SVGElement, url: string): void {
+    if (!isPlatformBrowser(this.platformId)) { return; }
     const scripts = svg.querySelectorAll('script');
     const scriptsToEval = [];
     let script, scriptType;
@@ -198,7 +203,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
     // Run scripts in closure as needed
     if (scriptsToEval.length > 0 && (this.evalScripts === 'always' ||
-        (this.evalScripts === 'once' && !this._ranScripts[url]))) {
+      (this.evalScripts === 'once' && !this._ranScripts[url]))) {
       for (let i = 0; i < scriptsToEval.length; i++) {
         new Function(scriptsToEval[i])(window);
       }
@@ -212,8 +217,8 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
     // Insert fallback image, if specified
     if (this.fallbackImgUrl) {
-      const elImg = document.createElement('IMG') as HTMLImageElement;
-      elImg.src = this.fallbackImgUrl;
+      const elImg = this._renderer.createElement('IMG');
+      this._renderer.setAttribute(elImg, 'src', this.fallbackImgUrl);
 
       this._insertEl(elImg);
     }

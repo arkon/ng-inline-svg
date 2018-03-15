@@ -4,11 +4,13 @@ import { InlineSVGComponent } from './inline-svg.component';
 import { InlineSVGConfig, InlineSVGDefaultConfig } from './inline-svg.config';
 import { InlineSVGDirective } from './inline-svg.directive';
 import { SVGCacheService } from './svg-cache.service';
+import { InlineSVGService } from './inline-svg.service';
 
 @NgModule({
   declarations: [InlineSVGDirective, InlineSVGComponent],
   exports: [InlineSVGDirective],
   providers: [
+    InlineSVGService,
     SVGCacheService,
     { provide: InlineSVGConfig, useClass: InlineSVGDefaultConfig },
   ],
