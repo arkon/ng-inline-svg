@@ -65,7 +65,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     this._supportsSVG = checkSVGSupport();
 
     // Check if the browser supports embed SVGs
-    if (!this._supportsSVG) {
+    if (!isPlatformServer(this.platformId) && !this._supportsSVG) {
       this._fail('Embed SVG not supported by browser');
     }
   }
@@ -89,7 +89,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   }
 
   private _insertSVG(): void {
-    if (!this._supportsSVG) { return; }
+    if (!isPlatformServer(this.platformId) && !this._supportsSVG) { return; }
 
     // Check if a URL was actually passed into the directive
     if (!this.inlineSVG) {
