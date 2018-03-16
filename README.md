@@ -70,6 +70,56 @@ export class AppComponent {
 
 The SVG file (if found) will be inserted *inside* the element with the `[inlineSVG]` directive. Support for icons using the [`symbol` method](https://css-tricks.com/svg-symbol-good-choice-icons/) is also supported (e.g. `[inlineSVG]="'#shape-id'"`).
 
+### Server-side rendering with Angular Universal
+
+The SVG files can also be rendered server-side. For this to work, you have to set the `baseURL`, since Angular needs to have an absolute URL to retrieve the files server-side and we're not able to get your baseURL automatically in a server-side environment. See manual for setting `baseURL` above.
+
+Here is one way to achieve this dynamically by adding an app initalizing service which sets the base URL based on the environment it runs.
+
+*app.module.ts*:
+```typescript
+import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { HttpClientModule } from "@angular/common/http";
+ 
+import { AppLoadService } from './app-load.service';
+ 
+export function initApp(appLoadService: AppLoadService) {
+    return () => appLoadService.initializeApp();
+}
+ 
+@NgModule({
+  imports: [HttpClientModule],
+  providers: [
+    AppLoadService,
+    { provide: APP_INITIALIZER, useFactory: initApp, deps: [AppLoadService], multi: true },
+  ]
+})
+export class AppLoadModule { }
+```
+
+*app-load.service.ts*:
+```typescript
+import { Injectable } from '@angular/core';
+ 
+import { APP_SETTINGS } from '../settings';
+ 
+@Injectable()
+export class AppLoadService {
+  constructor() { }
+ 
+  initializeApp(): Promise<any> {
+    // Do what ever conditions you need to set this, e.g. checking for server-side rendering
+    // and only set baseURL when server-side rendered if you want.
+    // Example: When the server-side rendered app runs on localhost:3000, make sure baseURL is
+    // http://localhost:3000 and make sure the express server is configured properly to 
+    // allow the URL of the asset folders storing the svg files.
+    // ...
+
+    // Set baseURL
+    this.svgService.setBaseUrl({ baseUrl: APP_SETTINGS.myBaseURLOfTheCurrentEnvironment });
+  }
+}
+```
 
 ### Options
 
