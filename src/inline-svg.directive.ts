@@ -99,10 +99,10 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
     // Support for symbol IDs
     if (this.inlineSVG.charAt(0) === '#' || this.inlineSVG.indexOf('.svg#') > -1) {
-      const elSvg = this._renderer.createElement('svg', 'http://www.w3.org/2000/svg');
-      const elSvgUse = this._renderer.createElement('use', 'http://www.w3.org/2000/svg');
+      const elSvg = this._renderer.createElement('svg', 'svg');
+      const elSvgUse = this._renderer.createElement('use', 'svg');
       const absUrl = this._svgCache.getAbsoluteUrl(this.inlineSVG);
-      this._renderer.setAttribute(elSvgUse, 'href', absUrl, 'http://www.w3.org/1999/xlink');
+      this._renderer.setAttribute(elSvgUse, 'href', absUrl, 'xlink');
       this._renderer.appendChild(elSvg, elSvgUse);
 
       this._insertEl(elSvg);
