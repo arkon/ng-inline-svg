@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 
 import { InlineSVGDirective } from './inline-svg.directive';
-import { insertEl } from './utils';
+import { InlineSVGService } from './inline-svg.service';
 
 @Component({
   selector: 'inline-svg',
@@ -25,7 +25,7 @@ export class InlineSVGComponent implements AfterViewInit, OnChanges {
   /** @internal */
   _el: ElementRef;
 
-  constructor(el: ElementRef) {
+  constructor(private _inlineSVGService: InlineSVGService, el: ElementRef) {
     this._el = el;
   }
 
@@ -40,6 +40,12 @@ export class InlineSVGComponent implements AfterViewInit, OnChanges {
   }
 
   private _updateContent(): void {
-    insertEl(this.context, this._el.nativeElement, this.content, this.replaceContents, this.prepend);
+    this._inlineSVGService.insertEl(
+      this.context,
+      this._el.nativeElement,
+      this.content,
+      this.replaceContents,
+      this.prepend
+    );
   }
 }
