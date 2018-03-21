@@ -20,7 +20,6 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { InlineSVGComponent } from './inline-svg.component';
 import { SVGCacheService } from './svg-cache.service';
-import { checkSVGSupport } from './utils';
 import { InlineSVGService } from './inline-svg.service';
 
 @Directive({
@@ -62,7 +61,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     private _renderer: Renderer2,
     private _inlineSVGService: InlineSVGService,
     @Inject(PLATFORM_ID) private platformId: Object) {
-    this._supportsSVG = checkSVGSupport();
+    this._supportsSVG = this._checkSVGSupport();
 
     // Check if the browser supports embed SVGs
     if (!isPlatformServer(this.platformId) && !this._supportsSVG) {
@@ -222,5 +221,9 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
       this._insertEl(elImg);
     }
+  }
+
+  private _checkSVGSupport(): boolean {
+    return typeof SVGRect !== 'undefined';
   }
 }
