@@ -36,6 +36,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   @Input() forceEvalStyles: boolean = false;
   @Input() evalScripts: 'always' | 'once' | 'never' = 'always';
   @Input() fallbackImgUrl: string;
+  @Input() onSVGLoaded: (svg: SVGElement) => SVGElement;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
   @Output() onSVGFailed: EventEmitter<any> = new EventEmitter<any>();
@@ -71,11 +72,13 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId) && !isPlatformServer(this.platformId)) { return; }
+
     this._insertSVG();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (!isPlatformBrowser(this.platformId) && !isPlatformServer(this.platformId)) { return; }
+
     if (changes['inlineSVG']) {
       this._insertSVG();
     }
@@ -124,6 +127,10 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
               this._removeAttributes(svg, this.removeSVGAttributes);
             }
 
+            if (this.onSVGLoaded) {
+              svg = this.onSVGLoaded(svg);
+            }
+
             this._insertEl(svg);
 
             // Script evaluation
@@ -169,6 +176,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
   private _removeAttributes(svg: SVGElement, attrs: Array<string>): void {
     if (!isPlatformBrowser(this.platformId)) { return; }
+
     const innerEls = svg.getElementsByTagName('*');
 
     for (let i = 0; i < innerEls.length; i++) {
@@ -185,6 +193,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   // Based off of code from https://github.com/iconic/SVGInjector
   private _evalScripts(svg: SVGElement, url: string): void {
     if (!isPlatformBrowser(this.platformId)) { return; }
+
     const scripts = svg.querySelectorAll('script');
     const scriptsToEval = [];
     let script, scriptType;
@@ -226,4 +235,5 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   private _checkSVGSupport(): boolean {
     return typeof SVGRect !== 'undefined';
   }
+
 }
