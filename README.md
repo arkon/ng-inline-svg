@@ -85,6 +85,7 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 | evalScripts | `'always'`, `'once'`, `'none'` | `'always'` | Whether to evaluate embedded scripts in the loaded SVG files. |
 | fallbackImgUrl | string | | URL for a regular image to be displayed as a fallback if the SVG fails to load. |
 | onSVGLoaded | `(svg: SVGElement) => SVGElement` | | Lifecycle hook that allows the loaded SVG to be manipulated prior to insertion. |
+| svgClass | string | | Applies a class directly to the SVG element |
 
 #### Outputs
 
