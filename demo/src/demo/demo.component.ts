@@ -21,8 +21,9 @@ export class DemoComponent implements OnInit {
     }, 100);
   }
 
-  handleSVG(svg: SVGElement): SVGElement {
-    console.log('Loaded SVG', svg);
+  handleSVG(svg: SVGElement, parent: Element | null): SVGElement {
+    console.log('Loaded SVG: ', svg, parent);
+    svg.setAttribute('width', '100');
     return svg;
   }
 }

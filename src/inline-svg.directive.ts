@@ -36,7 +36,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   @Input() forceEvalStyles: boolean = false;
   @Input() evalScripts: 'always' | 'once' | 'never' = 'always';
   @Input() fallbackImgUrl: string;
-  @Input() onSVGLoaded: (svg: SVGElement) => SVGElement;
+  @Input() onSVGLoaded: (svg: SVGElement, parent: Element | null) => SVGElement;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
   @Output() onSVGFailed: EventEmitter<any> = new EventEmitter<any>();
@@ -128,7 +128,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
             }
 
             if (this.onSVGLoaded) {
-              svg = this.onSVGLoaded(svg);
+              svg = this.onSVGLoaded(svg, this._el.nativeElement);
             }
 
             this._insertEl(svg);
