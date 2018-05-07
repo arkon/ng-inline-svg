@@ -1,13 +1,10 @@
-import { Injectable, Optional, Renderer2, RendererFactory2 } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/finally';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/share';
+import {Injectable, Optional, Renderer2, RendererFactory2} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable, of} from 'rxjs';
+import {map, finalize, catchError, share} from 'rxjs/operators';
 
-import { InlineSVGConfig } from './inline-svg.config';
+
+import {InlineSVGConfig} from './inline-svg.config';
 
 @Injectable()
 export class SVGCacheService {
@@ -42,7 +39,7 @@ export class SVGCacheService {
 
     // Return cached copy if it exists
     if (cache && SVGCacheService._cache.has(absUrl)) {
-      return Observable.of(this._cloneSVG(SVGCacheService._cache.get(absUrl)));
+      return of(this._cloneSVG(SVGCacheService._cache.get(absUrl)));
     }
 
     // Return existing fetch observable
@@ -51,17 +48,19 @@ export class SVGCacheService {
     }
 
     // Otherwise, make the HTTP call to fetch
-    const req = this._http.get(absUrl, { responseType: 'text' })
-      .catch((err: any) => err)
-      .finally(() => {
-        SVGCacheService._inProgressReqs.delete(absUrl);
-      })
-      .share()
-      .map((svgText: string) => {
-        const svgEl = this._svgElementFromString(svgText);
-        SVGCacheService._cache.set(absUrl, svgEl);
-        return this._cloneSVG(svgEl);
-      });
+    const req = this._http.get(absUrl, {responseType: 'text'})
+      .pipe(
+        catchError((err: any) => err),
+        finalize(() => {
+          SVGCacheService._inProgressReqs.delete(absUrl);
+        }),
+        share(),
+        map((svgText: string) => {
+          const svgEl = this._svgElementFromString(svgText);
+          SVGCacheService._cache.set(absUrl, svgEl);
+          return this._cloneSVG(svgEl);
+        })
+      );
 
     SVGCacheService._inProgressReqs.set(absUrl, req);
 
