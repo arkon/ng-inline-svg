@@ -1,10 +1,10 @@
-import {Injectable, Optional, Renderer2, RendererFactory2} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Observable, of} from 'rxjs';
-import {map, finalize, catchError, share} from 'rxjs/operators';
+import { Injectable, Optional, Renderer2, RendererFactory2 } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { map, finalize, catchError, share } from 'rxjs/operators';
 
 
-import {InlineSVGConfig} from './inline-svg.config';
+import { InlineSVGConfig } from './inline-svg.config';
 
 @Injectable()
 export class SVGCacheService {
@@ -107,4 +107,5 @@ export class SVGCacheService {
   private _cloneSVG(svg: SVGElement): SVGElement {
     return svg.cloneNode(true) as SVGElement;
   }
+
 }
