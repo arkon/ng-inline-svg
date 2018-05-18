@@ -15,7 +15,7 @@ import {
   SimpleChanges,
   ViewContainerRef,
 } from '@angular/core';
-import { isPlatformBrowser, isPlatformServer} from '@angular/common';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { Subscription } from 'rxjs';
 
 import { InlineSVGComponent } from './inline-svg.component';
