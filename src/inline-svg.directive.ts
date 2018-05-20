@@ -95,16 +95,14 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     if (!isPlatformServer(this.platformId) && !this._supportsSVG) { return; }
 
     // Check if a URL/string was actually passed into the directive
-    if (!this.inlineSVG && !this.isSVGString) {
-      this._fail('No URL passed to [inlineSVG]');
-      return;
-    } else if (!this.inlineSVG && this.isSVGString) {
-      this._fail('No SVG string passed to [inlineSVG]');
+    if (!this.inlineSVG) {
+      this._fail('No URL/string passed to [inlineSVG]');
       return;
     }
 
     if (this.isSVGString) {
-      this.insertSvgElement(this._svgElementFromString(this.inlineSVG));
+      const svgElement = this._svgElementFromString(this.inlineSVG);
+      this.insertSvgElement(svgElement);
     } else {
       this.insertSvgElementFromUrl();
     }
