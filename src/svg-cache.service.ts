@@ -1,7 +1,7 @@
 import { Injectable, Optional, Renderer2, RendererFactory2 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, finalize, catchError, share } from 'rxjs/operators';
+import { map, finalize, share } from 'rxjs/operators';
 
 
 import { InlineSVGConfig } from './inline-svg.config';
@@ -50,7 +50,6 @@ export class SVGCacheService {
     // Otherwise, make the HTTP call to fetch
     const req = this._http.get(absUrl, {responseType: 'text'})
       .pipe(
-        catchError((err: any) => err),
         finalize(() => {
           SVGCacheService._inProgressReqs.delete(absUrl);
         }),
