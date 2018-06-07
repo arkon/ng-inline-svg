@@ -31,7 +31,7 @@ import { InlineSVGModule } from 'ng-inline-svg';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, HttpClientModule, InlineSVGModule],
+  imports: [BrowserModule, HttpClientModule, InlineSVGModule.forRoot()],
   bootstrap: [AppComponent]
 })
 class AppModule {}
