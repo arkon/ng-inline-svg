@@ -12,9 +12,9 @@ enableProdMode();
 
 @NgModule({
   declarations: [DemoComponent],
-  imports: [BrowserModule, HttpClientModule, InlineSVGModule],
+  imports: [BrowserModule, HttpClientModule, InlineSVGModule.forRoot()],
   bootstrap: [DemoComponent]
 })
-class DemoAppModule {}
+class DemoAppModule { }
 
 platformBrowserDynamic().bootstrapModule(DemoAppModule);
