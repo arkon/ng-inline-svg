@@ -43,18 +43,6 @@ The base URL will be automatically fetched based on your `<base>` tag. If you wa
 InlineSVGModule.forRoot({ baseUrl: 'https://mysite.com/myapp/' })
 ```
 
-If you want to configure the base URL later, use the service's function:
-
-```typescript
-import { SVGCacheService } from 'ng-inline-svg';
-
-class YourComponent {
-  constructor(svgService: SVGCacheService) {
-    svgService.setBaseUrl({ baseUrl: 'https://mysite.com/myapp/' });
-  }
-}
-```
-
 You can then use the directive in your templates:
 
 ```typescript
