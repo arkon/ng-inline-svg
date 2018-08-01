@@ -174,19 +174,20 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private _removeAttributes(svg: SVGElement, attrs: Array<string>): void {
+  private _removeAttributes(element: Element, attrs: Array<string>): void {
     if (!isPlatformBrowser(this.platformId)) { return; }
 
-    const innerEls = svg.getElementsByTagName('*');
-
-    for (let i = 0; i < innerEls.length; i++) {
-      const elAttrs = innerEls[i].attributes;
-
-      for (let j = 0; j < elAttrs.length; j++) {
-        if (attrs.indexOf(elAttrs[j].name.toLowerCase()) > -1) {
-          innerEls[i].removeAttribute(elAttrs[j].name);
-        }
+    const svgAttrs = element.attributes;
+    for (let i = 0; i < svgAttrs.length; i++) {
+      if (attrs.indexOf(svgAttrs[i].name.toLowerCase()) > -1) {
+        element.removeAttribute(svgAttrs[i].name);
       }
+    }
+
+    // Child nodes
+    const innerEls = element.getElementsByTagName('*');
+    for (let i = 0; i < innerEls.length; i++) {
+      this._removeAttributes(innerEls[i], attrs);
     }
   }
 
