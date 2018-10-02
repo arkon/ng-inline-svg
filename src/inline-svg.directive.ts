@@ -105,30 +105,28 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
     this._prevUrl = this.inlineSVG;
 
-    if (this._isUrlSymbol(this.inlineSVG)) {
-      // Symbol within an SVG
-      const absUrl = this._svgCache.getAbsoluteUrl(this.inlineSVG);
+    this._subscription = this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
+      .subscribe(
+        (svg: SVGElement) => {
+          if (this._isUrlSymbol(this.inlineSVG)) {
+            const symbolId = '#' + this.inlineSVG.split('#')[1];
 
-      const elSvg = this._renderer.createElement('svg', 'svg');
-      const elSvgUse = this._renderer.createElement('use', 'svg');
-      this._renderer.setAttribute(elSvgUse, 'href', absUrl, 'xlink');
-      this._renderer.appendChild(elSvg, elSvgUse);
+            const elSvg = this._renderer.createElement('svg', 'svg');
+            this._renderer.appendChild(elSvg, svg.querySelector(symbolId));
 
-      this._insertEl(elSvg);
+            const elSvgUse = this._renderer.createElement('use', 'svg');
+            this._renderer.setAttribute(elSvgUse, 'href', symbolId, 'xlink');
+            this._renderer.appendChild(elSvg, elSvgUse);
 
-      this.onSVGInserted.emit(elSvg);
-    } else {
-      // Regular SVG
-      this._subscription = this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
-        .subscribe(
-          (svg: SVGElement) => {
+            this._processSvg(elSvg);
+          } else {
             this._processSvg(svg);
-          },
-          (err: any) => {
-            this._fail(err);
           }
-        );
-    }
+        },
+        (err: any) => {
+          this._fail(err);
+        }
+      );
   }
 
   private _processSvg(svg: SVGElement) {
