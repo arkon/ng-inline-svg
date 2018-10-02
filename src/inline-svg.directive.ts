@@ -99,57 +99,63 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    // Support for symbol IDs
-    if (this.inlineSVG.charAt(0) === '#' || this.inlineSVG.indexOf('.svg#') > -1) {
+    if (this.inlineSVG === this._prevUrl) {
+      return;
+    }
+
+    this._prevUrl = this.inlineSVG;
+
+    if (this._isUrlSymbol(this.inlineSVG)) {
+      // Symbol within an SVG
+      const absUrl = this._svgCache.getAbsoluteUrl(this.inlineSVG);
+
       const elSvg = this._renderer.createElement('svg', 'svg');
       const elSvgUse = this._renderer.createElement('use', 'svg');
-      const absUrl = this._svgCache.getAbsoluteUrl(this.inlineSVG);
       this._renderer.setAttribute(elSvgUse, 'href', absUrl, 'xlink');
       this._renderer.appendChild(elSvg, elSvgUse);
 
       this._insertEl(elSvg);
 
       this.onSVGInserted.emit(elSvg);
-      return;
-    }
-
-    if (this.inlineSVG !== this._prevUrl) {
-      this._prevUrl = this.inlineSVG;
-
-      // Fetch SVG via cache mechanism
+    } else {
+      // Regular SVG
       this._subscription = this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
         .subscribe(
           (svg: SVGElement) => {
-            if (!svg) { return; }
-
-            // Insert SVG
-            if (this.removeSVGAttributes) {
-              this._removeAttributes(svg, this.removeSVGAttributes);
-            }
-
-            if (this.onSVGLoaded) {
-              svg = this.onSVGLoaded(svg, this._el.nativeElement);
-            }
-
-            this._insertEl(svg);
-
-            // Script evaluation
-            this._evalScripts(svg, this.inlineSVG);
-
-            // Force evaluation of <style> tags since IE doesn't do it.
-            // See https://github.com/arkon/ng-inline-svg/issues/17
-            if (this.forceEvalStyles) {
-              const styleTags = svg.querySelectorAll('style');
-              Array.from(styleTags).forEach(tag => tag.textContent += '');
-            }
-
-            this.onSVGInserted.emit(svg);
+            this._processSvg(svg);
           },
           (err: any) => {
             this._fail(err);
           }
         );
     }
+  }
+
+  private _processSvg(svg: SVGElement) {
+    if (!svg) { return; }
+
+    // Insert SVG
+    if (this.removeSVGAttributes) {
+      this._removeAttributes(svg, this.removeSVGAttributes);
+    }
+
+    if (this.onSVGLoaded) {
+      svg = this.onSVGLoaded(svg, this._el.nativeElement);
+    }
+
+    this._insertEl(svg);
+
+    // Script evaluation
+    this._evalScripts(svg, this.inlineSVG);
+
+    // Force evaluation of <style> tags since IE doesn't do it.
+    // See https://github.com/arkon/ng-inline-svg/issues/17
+    if (this.forceEvalStyles) {
+      const styleTags = svg.querySelectorAll('style');
+      Array.from(styleTags).forEach(tag => tag.textContent += '');
+    }
+
+    this.onSVGInserted.emit(svg);
   }
 
   private _insertEl(el: Element): void {
@@ -231,6 +237,10 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
       this._insertEl(elImg);
     }
+  }
+
+  private _isUrlSymbol(url: string): boolean {
+    return url.charAt(0) === '#' || url.indexOf('.svg#') > -1;
   }
 
   private _checkSVGSupport(): boolean {
