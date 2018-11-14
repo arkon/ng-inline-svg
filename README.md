@@ -95,7 +95,6 @@ import { SvgConfig } from './svg-config';
  
 @NgModule({
   providers: [
-    AppLoadService,
     { provide: InlineSVGConfig, useClass: SvgConfig  },
   ]
 })
