@@ -87,36 +87,28 @@ The SVG files can also be rendered server-side. For this to work, you have to se
 
 Here is one way to achieve this dynamically by adding an app initalizing service which sets the base URL based on the environment it runs.
 
-*app.module.ts*:
+*app-server.module.ts*:
 ```typescript
 import { NgModule, APP_INITIALIZER } from '@angular/core';
- 
-import { AppLoadService } from './app-load.service';
- 
-export function initApp(appLoadService: AppLoadService) {
-    return () => appLoadService.initializeApp();
-}
+import { InlineSVGConfig } from 'ng-inline-svg/lib/inline-svg.config';
+import { SvgConfig } from './svg-config';
  
 @NgModule({
   providers: [
-    AppLoadService,
-    { provide: APP_INITIALIZER, useFactory: initApp, deps: [AppLoadService], multi: true },
+    { provide: InlineSVGConfig, useClass: SvgConfig  },
   ]
 })
-export class AppLoadModule { }
+export class AppServerModule { }
 ```
 
-*app-load.service.ts*:
+*svg-config.ts*:
 ```typescript
-import { Injectable } from '@angular/core';
- 
 import { APP_SETTINGS } from '../settings';
- 
+import { Injectable, Inject } from '@angular/core';
+import { InlineSVGConfig } from 'ng-inline-svg/lib/inline-svg.config';
+
 @Injectable()
-export class AppLoadService {
-  constructor() { }
- 
-  initializeApp() {
+export class SvgConfig extends InlineSVGConfig {
     // Do what ever conditions you need to set this, e.g. checking for server-side rendering
     // and only set baseURL when server-side rendered if you want.
     // Example: When the server-side rendered app runs on localhost:3000, make sure baseURL is
@@ -125,7 +117,9 @@ export class AppLoadService {
     // ...
 
     // Set baseURL
-    this.svgService.setBaseUrl({ baseUrl: APP_SETTINGS.myBaseURLOfTheCurrentEnvironment });
-  }
+	constructor(...) {
+		super();
+		this.baseUrl = APP_SETTINGS.myBaseURLOfTheCurrentEnvironment;
+	}
 }
 ```
