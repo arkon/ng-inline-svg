@@ -52,8 +52,7 @@ You can then use the directive in your templates:
     <div class="my-icon" aria-label="My icon" [inlineSVG]="'/img/image.svg'"></div>
   `
 })
-export class AppComponent {
-}
+export class AppComponent {}
 ```
 
 The SVG file (if found) will be inserted *inside* the element with the `[inlineSVG]` directive. Support for icons using the [`symbol` method](https://css-tricks.com/svg-symbol-good-choice-icons/) is also supported (e.g. `[inlineSVG]="'#shape-id'"`).
@@ -90,36 +89,33 @@ Here is one way to achieve this dynamically by adding an app initalizing service
 *app-server.module.ts*:
 ```typescript
 import { NgModule, APP_INITIALIZER } from '@angular/core';
-import { InlineSVGConfig } from 'ng-inline-svg/lib/inline-svg.config';
-import { SvgConfig } from './svg-config';
+import { InlineSVGConfig } from 'ng-inline-svg';
+import { SVGonfig } from './svg-config';
  
 @NgModule({
   providers: [
-    { provide: InlineSVGConfig, useClass: SvgConfig  },
+    { provide: InlineSVGConfig, useClass: SVGonfig }
   ]
 })
-export class AppServerModule { }
+export class AppServerModule {}
 ```
 
 *svg-config.ts*:
 ```typescript
-import { APP_SETTINGS } from '../settings';
 import { Injectable, Inject } from '@angular/core';
-import { InlineSVGConfig } from 'ng-inline-svg/lib/inline-svg.config';
+import { InlineSVGConfig } from 'ng-inline-svg';
 
 @Injectable()
-export class SvgConfig extends InlineSVGConfig {
-    // Do what ever conditions you need to set this, e.g. checking for server-side rendering
-    // and only set baseURL when server-side rendered if you want.
-    // Example: When the server-side rendered app runs on localhost:3000, make sure baseURL is
-    // http://localhost:3000 and make sure the express server is configured properly to 
-    // allow the URL of the asset folders storing the svg files.
-    // ...
+export class SVGonfig extends InlineSVGConfig {
+  // Do what ever conditions you need to set this, e.g. checking for server-side rendering
+  // and only set baseURL when server-side rendered if you want.
+  // Example: When the server-side rendered app runs on localhost:3000, make sure baseURL is
+  // http://localhost:3000 and make sure the Express server is configured properly to 
+  // allow the URL of the asset folders storing the SVG files.
 
-    // Set baseURL
-	constructor(...) {
-		super();
-		this.baseUrl = APP_SETTINGS.myBaseURLOfTheCurrentEnvironment;
-	}
+  constructor(...) {
+    super();
+    this.baseUrl = "http://localhost:3000";
+  }
 }
 ```
