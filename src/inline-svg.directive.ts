@@ -210,7 +210,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
       if (!scriptType || scriptType === 'application/ecmascript' || scriptType === 'application/javascript') {
         script = scripts[i].innerText || scripts[i].textContent;
         scriptsToEval.push(script);
-        svg.removeChild(scripts[i]);
+        this._renderer.removeChild(scripts[i].parentNode, scripts[i]);
       }
     }
 
