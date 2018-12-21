@@ -112,7 +112,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
             const symbolId = this.inlineSVG.split('#')[1];
 
             const elSvg = this._renderer.createElement('svg', 'svg');
-            this._renderer.appendChild(elSvg, svg.querySelector("[id='"+symbolId+"']");
+            this._renderer.appendChild(elSvg, svg.querySelector("[id='"+symbolId+"']"));
 
             const elSvgUse = this._renderer.createElement('use', 'svg');
             this._renderer.setAttribute(elSvgUse, 'href', symbolId, 'xlink');
