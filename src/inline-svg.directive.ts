@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs';
 import { InlineSVGComponent } from './inline-svg.component';
 import { SVGCacheService } from './svg-cache.service';
 import { InlineSVGService } from './inline-svg.service';
+import * as SvgUtil from './svg-util';
 
 @Directive({
   selector: '[inlineSVG]',
@@ -62,11 +63,11 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     private _renderer: Renderer2,
     private _inlineSVGService: InlineSVGService,
     @Inject(PLATFORM_ID) private platformId: Object) {
-    this._supportsSVG = this._checkSVGSupport();
+    this._supportsSVG = SvgUtil.isSvgSupported();
 
     // Check if the browser supports embed SVGs
     if (!isPlatformServer(this.platformId) && !this._supportsSVG) {
-      this._fail('Embed SVG not supported by browser');
+      this._fail('Embed SVG are not supported by this browser');
     }
   }
 
@@ -99,34 +100,21 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
+    // Short circuit if SVG URL hasn't changed
     if (this.inlineSVG === this._prevUrl) {
       return;
     }
-
     this._prevUrl = this.inlineSVG;
 
     this._subscription = this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
       .subscribe(
         (svg: SVGElement) => {
-          if (this._isUrlSymbol(this.inlineSVG)) {
+          if (SvgUtil.isUrlSymbol(this.inlineSVG)) {
             const symbolId = this.inlineSVG.split('#')[1];
-            const symbol = svg.querySelector(`[id="${symbolId}"]`);
-            if (!symbol) {
-              this._fail(`Symbol "${symbolId}" not found`);
-              return;
-            }
-
-            const elSvg = this._renderer.createElement('svg', 'svg');
-            this._renderer.appendChild(elSvg, symbol);
-
-            const elSvgUse = this._renderer.createElement('use', 'svg');
-            this._renderer.setAttribute(elSvgUse, 'href', `#${symbolId}`, 'xlink');
-            this._renderer.appendChild(elSvg, elSvgUse);
-
-            this._processSvg(elSvg);
-          } else {
-            this._processSvg(svg);
+            svg = SvgUtil.createSymbolSvg(this._renderer, svg, symbolId);
           }
+
+          this._processSvg(svg);
         },
         (err: any) => {
           this._fail(err);
@@ -134,12 +122,17 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
       );
   }
 
+  /**
+   * The actual processing (manipulation, lifecycle, etc.) and displaying of the
+   * SVG.
+   *
+   * @param svg The SVG to display within the directive element.
+   */
   private _processSvg(svg: SVGElement) {
     if (!svg) { return; }
 
-    // Insert SVG
-    if (this.removeSVGAttributes) {
-      this._removeAttributes(svg, this.removeSVGAttributes);
+    if (this.removeSVGAttributes && isPlatformBrowser(this.platformId)) {
+      SvgUtil.removeAttributes(svg, this.removeSVGAttributes);
     }
 
     if (this.onSVGLoaded) {
@@ -148,8 +141,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
     this._insertEl(svg);
 
-    // Script evaluation
-    this._evalScripts(svg, this.inlineSVG);
+    this._evalScripts(svg);
 
     // Force evaluation of <style> tags since IE doesn't do it.
     // See https://github.com/arkon/ng-inline-svg/issues/17
@@ -161,6 +153,12 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     this.onSVGInserted.emit(svg);
   }
 
+  /**
+   * Handles the insertion of the directive contents, which could be an SVG
+   * element or a component.
+   *
+   * @param el The element to put within the directive.
+   */
   private _insertEl(el: Element): void {
     if (this.injectComponent) {
       if (!this._svgComp) {
@@ -183,25 +181,13 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private _removeAttributes(element: Element, attrs: Array<string>): void {
-    if (!isPlatformBrowser(this.platformId)) { return; }
-
-    const svgAttrs = element.attributes;
-    for (let i = 0; i < svgAttrs.length; i++) {
-      if (attrs.indexOf(svgAttrs[i].name.toLowerCase()) > -1) {
-        element.removeAttribute(svgAttrs[i].name);
-      }
-    }
-
-    // Child nodes
-    const innerEls = element.getElementsByTagName('*');
-    for (let i = 0; i < innerEls.length; i++) {
-      this._removeAttributes(innerEls[i], attrs);
-    }
-  }
-
-  // Based off of code from https://github.com/iconic/SVGInjector
-  private _evalScripts(svg: SVGElement, url: string): void {
+  /**
+   * Executes scripts from within the SVG.
+   * Based off of code from https://github.com/iconic/SVGInjector
+   *
+   * @param svg SVG with scripts to evaluate.
+   */
+  private _evalScripts(svg: SVGElement): void {
     if (!isPlatformBrowser(this.platformId)) { return; }
 
     const scripts = svg.querySelectorAll('script');
@@ -221,12 +207,12 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
     // Run scripts in closure as needed
     if (scriptsToEval.length > 0 && (this.evalScripts === 'always' ||
-      (this.evalScripts === 'once' && !this._ranScripts[url]))) {
+      (this.evalScripts === 'once' && !this._ranScripts[this.inlineSVG]))) {
       for (let i = 0; i < scriptsToEval.length; i++) {
         new Function(scriptsToEval[i])(window);
       }
 
-      this._ranScripts[url] = true;
+      this._ranScripts[this.inlineSVG] = true;
     }
   }
 
@@ -240,14 +226,6 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
       this._insertEl(elImg);
     }
-  }
-
-  private _isUrlSymbol(url: string): boolean {
-    return url.charAt(0) === '#' || url.indexOf('.svg#') > -1;
-  }
-
-  private _checkSVGSupport(): boolean {
-    return typeof SVGRect !== 'undefined';
   }
 
 }
