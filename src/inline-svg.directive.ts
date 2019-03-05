@@ -46,14 +46,10 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   _prevSVG: SVGElement;
 
   private _supportsSVG: boolean;
-
   private _prevUrl: string;
-
-  private _ranScripts: { [url: string]: boolean } = {};
+  private _svgComp: ComponentRef<InlineSVGComponent>;
 
   private _subscription: Subscription;
-
-  private _svgComp: ComponentRef<InlineSVGComponent>;
 
   constructor(
     private _el: ElementRef,
@@ -141,7 +137,9 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
     this._insertEl(svg);
 
-    this._evalScripts(svg);
+    if (isPlatformBrowser(this.platformId)) {
+      this._inlineSVGService.evalScripts(svg, this.inlineSVG, this.evalScripts);
+    }
 
     // Force evaluation of <style> tags since IE doesn't do it.
     // See https://github.com/arkon/ng-inline-svg/issues/17
@@ -178,41 +176,6 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
       );
     } else {
       this._inlineSVGService.insertEl(this, this._el.nativeElement, el, this.replaceContents, this.prepend);
-    }
-  }
-
-  /**
-   * Executes scripts from within the SVG.
-   * Based off of code from https://github.com/iconic/SVGInjector
-   *
-   * @param svg SVG with scripts to evaluate.
-   */
-  private _evalScripts(svg: SVGElement): void {
-    if (!isPlatformBrowser(this.platformId)) { return; }
-
-    const scripts = svg.querySelectorAll('script');
-    const scriptsToEval = [];
-    let script, scriptType;
-
-    // Fetch scripts from SVG
-    for (let i = 0; i < scripts.length; i++) {
-      scriptType = scripts[i].getAttribute('type');
-
-      if (!scriptType || scriptType === 'application/ecmascript' || scriptType === 'application/javascript') {
-        script = scripts[i].innerText || scripts[i].textContent;
-        scriptsToEval.push(script);
-        this._renderer.removeChild(scripts[i].parentNode, scripts[i]);
-      }
-    }
-
-    // Run scripts in closure as needed
-    if (scriptsToEval.length > 0 && (this.evalScripts === 'always' ||
-      (this.evalScripts === 'once' && !this._ranScripts[this.inlineSVG]))) {
-      for (let i = 0; i < scriptsToEval.length; i++) {
-        new Function(scriptsToEval[i])(window);
-      }
-
-      this._ranScripts[this.inlineSVG] = true;
     }
   }
 

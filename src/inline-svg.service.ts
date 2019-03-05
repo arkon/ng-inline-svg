@@ -3,7 +3,9 @@ import { InlineSVGDirective } from './inline-svg.directive';
 
 @Injectable()
 export class InlineSVGService {
+
   private _renderer: Renderer2;
+  private _ranScripts: { [url: string]: boolean } = {};
 
   constructor(rendererFactory: RendererFactory2) {
     this._renderer = rendererFactory.createRenderer(null, null);
@@ -34,4 +36,40 @@ export class InlineSVGService {
       dir._prevSVG = content as SVGElement;
     }
   }
+
+  /**
+   * Executes scripts from within the SVG.
+   * Based off of code from https://github.com/iconic/SVGInjector
+   *
+   * @param svg SVG with scripts to evaluate.
+   * @param url URL from which the SVG was loaded from.
+   * @param evalMode Evaluation mode. Can be one of "always", "once", or "none".
+   */
+  evalScripts(svg: SVGElement, url: string, evalMode: string): void {
+    const scripts = svg.querySelectorAll('script');
+    const scriptsToEval = [];
+    let script, scriptType;
+
+    // Fetch scripts from SVG
+    for (let i = 0; i < scripts.length; i++) {
+      scriptType = scripts[i].getAttribute('type');
+
+      if (!scriptType || scriptType === 'application/ecmascript' || scriptType === 'application/javascript') {
+        script = scripts[i].innerText || scripts[i].textContent;
+        scriptsToEval.push(script);
+        this._renderer.removeChild(scripts[i].parentNode, scripts[i]);
+      }
+    }
+
+    // Run scripts in closure as needed
+    if (scriptsToEval.length > 0 && (evalMode === 'always' ||
+      (evalMode === 'once' && !this._ranScripts[url]))) {
+      for (let i = 0; i < scriptsToEval.length; i++) {
+        new Function(scriptsToEval[i])(window);
+      }
+
+      this._ranScripts[url] = true;
+    }
+  }
+
 }
