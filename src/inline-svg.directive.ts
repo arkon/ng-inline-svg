@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs';
 import { InlineSVGComponent } from './inline-svg.component';
 import { SVGCacheService } from './svg-cache.service';
 import { InlineSVGService } from './inline-svg.service';
+import { SVGScriptEvalMode } from './inline-svg.config';
 import * as SvgUtil from './svg-util';
 
 @Directive({
@@ -35,7 +36,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   @Input() cacheSVG: boolean = true;
   @Input() removeSVGAttributes: Array<string>;
   @Input() forceEvalStyles: boolean = false;
-  @Input() evalScripts: 'always' | 'once' | 'never' = 'always';
+  @Input() evalScripts: SVGScriptEvalMode = SVGScriptEvalMode.ALWAYS;
   @Input() fallbackImgUrl: string;
   @Input() onSVGLoaded: (svg: SVGElement, parent: Element | null) => SVGElement;
 

@@ -1,5 +1,6 @@
 import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { InlineSVGDirective } from './inline-svg.directive';
+import { SVGScriptEvalMode } from './inline-svg.config';
 
 @Injectable()
 export class InlineSVGService {
@@ -62,8 +63,8 @@ export class InlineSVGService {
     }
 
     // Run scripts in closure as needed
-    if (scriptsToEval.length > 0 && (evalMode === 'always' ||
-      (evalMode === 'once' && !this._ranScripts[url]))) {
+    if (scriptsToEval.length > 0 && (evalMode === SVGScriptEvalMode.ALWAYS ||
+      (evalMode === SVGScriptEvalMode.ONCE && !this._ranScripts[url]))) {
       for (let i = 0; i < scriptsToEval.length; i++) {
         new Function(scriptsToEval[i])(window);
       }
