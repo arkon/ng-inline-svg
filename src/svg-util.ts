@@ -23,7 +23,7 @@ export function isSvgSupported(): boolean {
  * @param svg The SVG to get the symbol from.
  * @param symbolId The ID of the symbol.
  */
-export function createSymbolSvg(renderer: Renderer2, svg: SVGElement, symbolId: String): SVGElement {
+export function createSymbolSvg(renderer: Renderer2, svg: SVGElement, symbolId: string): SVGElement {
   const symbol = svg.querySelector(`[id="${symbolId}"]`);
   if (!symbol) {
     throw new Error(`Symbol "${symbolId}" not found`);
