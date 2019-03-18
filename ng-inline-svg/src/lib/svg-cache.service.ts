@@ -6,6 +6,7 @@ import { map, finalize, share } from 'rxjs/operators';
 
 import { InlineSVGConfig } from './inline-svg.config';
 
+// @dynamic
 @Injectable()
 export class SVGCacheService {
   private static _cache: Map<string, SVGElement>;

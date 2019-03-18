@@ -1,25 +1,30 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "module": "es2015",
     "moduleResolution": "node",
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "declaration": true,
-    "removeComments": true,
-    "stripInternal": true,
-    "outDir": "lib/",
-    "lib": ["dom", "es5", "es2015.core", "es2015.collection", "es2015.iterable", "es2015.promise"]
-  },
-  "include": [
-    "src/**/*"
-  ],
-  "compileOnSave": false,
-  "buildOnSave": false,
-  "angularCompilerOptions": {
-    "skipTemplateCodegen": true,
-    "preserveWhitespaces": false
+    "importHelpers": true,
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ],
+    "paths": {
+      "ng-inline-svg": [
+        "dist/ng-inline-svg"
+      ],
+      "ng-inline-svg/*": [
+        "dist/ng-inline-svg/*"
+      ]
+    }
   }
 }
