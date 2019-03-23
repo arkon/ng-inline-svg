@@ -23,7 +23,8 @@ export function isSvgSupported(): boolean {
  * @param svg The SVG to get the symbol from.
  * @param symbolId The ID of the symbol.
  */
-export function createSymbolSvg(renderer: Renderer2, svg: SVGElement, symbolId: string): SVGElement {
+export function createSymbolSvg(
+  renderer: Renderer2, svg: SVGElement, symbolId: string): SVGElement {
   const symbol = svg.querySelector(`[id="${symbolId}"]`);
   if (!symbol) {
     throw new Error(`Symbol "${symbolId}" not found`);
@@ -57,5 +58,17 @@ export function removeAttributes(element: Element, attrs: Array<string>): void {
   const innerEls = element.getElementsByTagName('*');
   for (let i = 0; i < innerEls.length; i++) {
     removeAttributes(innerEls[i], attrs);
+  }
+}
+
+/**
+ * Sets attributes on an element.
+ *
+ * @param element Element to set attributes on.
+ * @param attrs Attribute key/values.
+ */
+export function setAttributes(element: Element, attrs: { string: any }): void {
+  for (const attr in attrs) {
+    element.setAttribute(attr, attrs[attr]);
   }
 }

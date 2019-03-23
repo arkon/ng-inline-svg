@@ -34,6 +34,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   @Input() prepend: boolean = false;
   @Input() injectComponent: boolean = false;
   @Input() cacheSVG: boolean = true;
+  @Input() setSVGAttributes: { string: any };
   @Input() removeSVGAttributes: Array<string>;
   @Input() forceEvalStyles: boolean = false;
   @Input() evalScripts: SVGScriptEvalMode = SVGScriptEvalMode.ALWAYS;
@@ -130,6 +131,10 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
     if (this.removeSVGAttributes && isPlatformBrowser(this.platformId)) {
       SvgUtil.removeAttributes(svg, this.removeSVGAttributes);
+    }
+
+    if (this.setSVGAttributes) {
+      SvgUtil.setAttributes(svg, this.setSVGAttributes);
     }
 
     if (this.onSVGLoaded) {
