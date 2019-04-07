@@ -49,14 +49,13 @@ export class InlineSVGService {
   evalScripts(svg: SVGElement, url: string, evalMode: string): void {
     const scripts = svg.querySelectorAll('script');
     const scriptsToEval = [];
-    let script, scriptType;
 
     // Fetch scripts from SVG
     for (let i = 0; i < scripts.length; i++) {
-      scriptType = scripts[i].getAttribute('type');
+      const scriptType = scripts[i].getAttribute('type');
 
       if (!scriptType || scriptType === 'application/ecmascript' || scriptType === 'application/javascript') {
-        script = scripts[i].innerText || scripts[i].textContent;
+        const script = scripts[i].innerText || scripts[i].textContent;
         scriptsToEval.push(script);
         this._renderer.removeChild(scripts[i].parentNode, scripts[i]);
       }
