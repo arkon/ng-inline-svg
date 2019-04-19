@@ -47,11 +47,10 @@ export function createSymbolSvg(
  * @param attrs Names of attributes to remove.
  */
 export function removeAttributes(element: Element, attrs: Array<string>): void {
-  const svgAttrs = element.attributes;
-  for (let i = 0; i < svgAttrs.length; i++) {
-    if (attrs.indexOf(svgAttrs[i].name.toLowerCase()) > -1) {
-      element.removeAttribute(svgAttrs[i].name);
-      i--;
+  for (let i = 0; i < attrs.length; i++) {
+    const elAttr = element.getAttribute(attrs[i]);
+    if (elAttr) {
+      element.removeAttribute(attrs[i]);
     }
   }
 
