@@ -51,6 +51,7 @@ export function removeAttributes(element: Element, attrs: Array<string>): void {
   for (let i = 0; i < svgAttrs.length; i++) {
     if (attrs.indexOf(svgAttrs[i].name.toLowerCase()) > -1) {
       element.removeAttribute(svgAttrs[i].name);
+      i--;
     }
   }
 
