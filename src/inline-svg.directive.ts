@@ -9,6 +9,7 @@ import {
   OnChanges,
   OnDestroy,
   OnInit,
+  Optional,
   Output,
   PLATFORM_ID,
   Renderer2,
@@ -21,7 +22,7 @@ import { Subscription } from 'rxjs';
 import { InlineSVGComponent } from './inline-svg.component';
 import { SVGCacheService } from './svg-cache.service';
 import { InlineSVGService } from './inline-svg.service';
-import { SVGScriptEvalMode } from './inline-svg.config';
+import { SVGScriptEvalMode, InlineSVGConfig } from './inline-svg.config';
 import * as SvgUtil from './svg-util';
 
 @Directive({
@@ -60,6 +61,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     private _svgCache: SVGCacheService,
     private _renderer: Renderer2,
     private _inlineSVGService: InlineSVGService,
+    @Optional() private _config: InlineSVGConfig,
     @Inject(PLATFORM_ID) private platformId: Object) {
     this._supportsSVG = SvgUtil.isSvgSupported();
 
@@ -72,11 +74,15 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId) && !isPlatformServer(this.platformId)) { return; }
 
+    if (isPlatformServer(this.platformId) && this._config.clientOnly) {return; }
+
     this._insertSVG();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (!isPlatformBrowser(this.platformId) && !isPlatformServer(this.platformId)) { return; }
+
+    if (isPlatformServer(this.platformId) && this._config.clientOnly) {return; }
 
     if (changes['inlineSVG']) {
       this._insertSVG();

@@ -1,5 +1,6 @@
 export class InlineSVGConfig {
-  baseUrl: string;
+  baseUrl?: string;
+  clientOnly?: boolean;
 }
 
 export const enum SVGScriptEvalMode {
