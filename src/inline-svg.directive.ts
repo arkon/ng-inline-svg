@@ -72,17 +72,13 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (!isPlatformBrowser(this.platformId) && !isPlatformServer(this.platformId)) { return; }
-
-    if (isPlatformServer(this.platformId) && this._config.clientOnly) {return; }
+    if (!this._isValidPlatform() || this._isSSRDisabled()) { return; }
 
     this._insertSVG();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!isPlatformBrowser(this.platformId) && !isPlatformServer(this.platformId)) { return; }
-
-    if (isPlatformServer(this.platformId) && this._config.clientOnly) {return; }
+    if (!this._isValidPlatform() || this._isSSRDisabled()) { return; }
 
     if (changes['inlineSVG']) {
       this._insertSVG();
@@ -201,6 +197,14 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
 
       this._insertEl(elImg);
     }
+  }
+
+  private _isValidPlatform(): boolean {
+    return isPlatformServer(this.platformId) || isPlatformBrowser(this.platformId);
+  }
+
+  private _isSSRDisabled(): boolean {
+    return isPlatformServer(this.platformId) && this._config.clientOnly;
   }
 
 }
