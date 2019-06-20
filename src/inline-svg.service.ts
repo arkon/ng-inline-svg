@@ -2,7 +2,9 @@ import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { InlineSVGDirective } from './inline-svg.directive';
 import { SVGScriptEvalMode } from './inline-svg.config';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class InlineSVGService {
 
   private _renderer: Renderer2;

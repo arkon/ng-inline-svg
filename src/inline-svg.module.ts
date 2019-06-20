@@ -3,8 +3,6 @@ import { NgModule, ModuleWithProviders } from '@angular/core';
 import { InlineSVGComponent } from './inline-svg.component';
 import { InlineSVGConfig } from './inline-svg.config';
 import { InlineSVGDirective } from './inline-svg.directive';
-import { SVGCacheService } from './svg-cache.service';
-import { InlineSVGService } from './inline-svg.service';
 
 @NgModule({
   declarations: [InlineSVGDirective, InlineSVGComponent],
@@ -16,8 +14,6 @@ export class InlineSVGModule {
     return {
       ngModule: InlineSVGModule,
       providers: [
-        InlineSVGService,
-        SVGCacheService,
         { provide: InlineSVGConfig, useValue: config }
       ]
     };
