@@ -204,7 +204,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   }
 
   private _isSSRDisabled(): boolean {
-    return isPlatformServer(this.platformId) && this._config.clientOnly;
+    return isPlatformServer(this.platformId) && this._config && this._config.clientOnly;
   }
 
 }
