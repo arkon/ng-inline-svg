@@ -67,7 +67,7 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 | prepend | boolean | `false` | Inserts before the first child instead of appending, overwrites `replaceContents` |
 | replaceContents | boolean | `true` | Replaces the contents of the element with the SVG instead of just appending it to its children. |
 | injectComponent | boolean | `false` | Injects an `<inline-svg>` component containing the SVG inside the element with the directive. |
-| setSVGAttributes | `{ string: any }` | | Sets attributes on the SVG element. Runs after `removeSVGAttributes`. |
+| setSVGAttributes | `{ [key: string]: any }` | | Sets attributes on the SVG element. Runs after `removeSVGAttributes`. |
 | removeSVGAttributes | string[] | | An array of attribute names to remove from all child elements within the SVG. |
 | forceEvalStyles | boolean | `false` | Forces embeded style tags' contents to be evaluated (for IE 11). |
 | evalScripts | `'always'`, `'once'`, `'none'` | `'always'` | Whether to evaluate embedded scripts in the loaded SVG files. The `SVGScriptEvalMode` enum is also provided. |

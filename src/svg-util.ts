@@ -67,7 +67,7 @@ export function removeAttributes(element: Element, attrs: Array<string>): void {
  * @param element Element to set attributes on.
  * @param attrs Attribute key/values.
  */
-export function setAttributes(element: Element, attrs: { string: any }): void {
+export function setAttributes(element: Element, attrs: { [key: string]: any }): void {
   for (const attr in attrs) {
     element.setAttribute(attr, attrs[attr]);
   }
