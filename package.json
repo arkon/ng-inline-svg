@@ -34,20 +34,20 @@
     "prepare": "npm run build"
   },
   "peerDependencies": {
-    "@angular/core": ">=6.0.0",
-    "@angular/common": ">=6.0.0",
-    "rxjs": "^6.0.0"
+    "@angular/core": ">=8.0.0",
+    "@angular/common": ">=8.0.0",
+    "rxjs": "^6.5.2"
   },
   "devDependencies": {
-    "@angular/common": "^6.1.10",
-    "@angular/compiler": "^6.1.10",
-    "@angular/compiler-cli": "^6.1.10",
-    "@angular/core": "^6.1.10",
-    "@angular/platform-browser": "^6.1.10",
-    "rimraf": "^2.6.3",
-    "rxjs": "^6.4.0",
-    "tslint": "^5.15.0",
-    "typescript": "~2.9.2",
-    "zone.js": "^0.8.20"
+    "@angular/common": "^8.2.3",
+    "@angular/compiler": "^8.2.3",
+    "@angular/compiler-cli": "^8.2.3",
+    "@angular/core": "^8.2.3",
+    "@angular/platform-browser": "^8.2.3",
+    "rimraf": "^3.0.0",
+    "rxjs": "^6.5.2",
+    "tslint": "^5.19.0",
+    "typescript": "~3.4.0",
+    "zone.js": "~0.9.1"
   }
 }
