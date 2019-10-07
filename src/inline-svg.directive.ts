@@ -31,6 +31,7 @@ import * as SvgUtil from './svg-util';
 })
 export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   @Input() inlineSVG: string;
+  @Input() resolveSVGUrl: boolean = true;
   @Input() replaceContents: boolean = true;
   @Input() prepend: boolean = false;
   @Input() injectComponent: boolean = false;
@@ -106,7 +107,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
     this._prevUrl = this.inlineSVG;
 
-    this._subscription = this._svgCache.getSVG(this.inlineSVG, this.cacheSVG)
+    this._subscription = this._svgCache.getSVG(this.inlineSVG, this.resolveSVGUrl, this.cacheSVG)
       .subscribe(
         (svg: SVGElement) => {
           if (SvgUtil.isUrlSymbol(this.inlineSVG)) {

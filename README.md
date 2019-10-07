@@ -64,6 +64,7 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 | Property name | Type | Default | Description |
 | ------------- | ---- | ------- | ----------- |
 | cacheSVG | boolean | `true` | Caches the SVG based on the absolute URL. Cache only persists for the (sessional) lifetime of the page. |
+| resolveSVGUrl | boolean | `true` | Bypass logic that tries to determine the absolute URL using the page's or configured base URL. |
 | prepend | boolean | `false` | Inserts before the first child instead of appending, overwrites `replaceContents` |
 | replaceContents | boolean | `true` | Replaces the contents of the element with the SVG instead of just appending it to its children. |
 | injectComponent | boolean | `false` | Injects an `<inline-svg>` component containing the SVG inside the element with the directive. |
