@@ -16,16 +16,15 @@ export class SVGCacheService {
   private _baseUrl: string;
 
   private _http: HttpClient;
-
   private _renderer: Renderer2;
 
   constructor(
     @Optional() @Inject(APP_BASE_HREF) private _appBase: string,
     @Optional() private _location: PlatformLocation,
     @Optional() private _config: InlineSVGConfig,
-    private httpBackend: HttpBackend,
+    httpBackend: HttpBackend,
     rendererFactory: RendererFactory2) {
-    this._http = new HttpClient(this.httpBackend);
+    this._http = new HttpClient(httpBackend);
     this._renderer = rendererFactory.createRenderer(null, null);
 
     this.setBaseUrl();
