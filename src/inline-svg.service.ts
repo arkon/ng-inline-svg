@@ -17,7 +17,7 @@ export class InlineSVGService {
   insertEl(
     dir: InlineSVGDirective,
     parentEl: HTMLElement,
-    content: Element,
+    content: HTMLElement | SVGElement,
     replaceContents: boolean,
     prepend: boolean) {
     if (replaceContents && !prepend) {

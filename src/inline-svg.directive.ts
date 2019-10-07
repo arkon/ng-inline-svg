@@ -166,7 +166,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
    *
    * @param el The element to put within the directive.
    */
-  private _insertEl(el: Element): void {
+  private _insertEl(el: HTMLElement | SVGElement): void {
     if (this.injectComponent) {
       if (!this._svgComp) {
         const factory = this._resolver.resolveComponentFactory(InlineSVGComponent);

@@ -18,7 +18,7 @@ import { InlineSVGService } from './inline-svg.service';
 })
 export class InlineSVGComponent implements AfterViewInit, OnChanges {
   @Input() context: InlineSVGDirective;
-  @Input() content: Element;
+  @Input() content: HTMLElement | SVGElement;
   @Input() replaceContents: boolean;
   @Input() prepend: boolean;
 
