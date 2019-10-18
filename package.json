@@ -34,8 +34,8 @@
     "prepare": "npm run build"
   },
   "peerDependencies": {
-    "@angular/core": ">=8.0.0",
-    "@angular/common": ">=8.0.0",
+    "@angular/core": "^8.0.0 || ^9.0.0",
+    "@angular/common": "^8.0.0 || ^9.0.0",
     "rxjs": "^6.5.0"
   },
   "devDependencies": {
