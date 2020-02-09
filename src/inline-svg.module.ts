@@ -10,7 +10,7 @@ import { InlineSVGDirective } from './inline-svg.directive';
   entryComponents: [InlineSVGComponent]
 })
 export class InlineSVGModule {
-  static forRoot(config?: InlineSVGConfig): ModuleWithProviders {
+  static forRoot(config?: InlineSVGConfig): ModuleWithProviders<InlineSVGModule> {
     return {
       ngModule: InlineSVGModule,
       providers: [

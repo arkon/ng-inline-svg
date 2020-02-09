@@ -48,7 +48,7 @@
     "@angular/compiler-cli": "^8.2.14",
     "@angular/core": "^8.2.14",
     "@angular/platform-browser": "^8.2.14",
-    "rimraf": "^3.0.0",
+    "rimraf": "^3.0.1",
     "rxjs": "^6.5.4",
     "tslint": "^5.20.1",
     "typescript": "~3.4.0",
