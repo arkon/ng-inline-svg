@@ -21,9 +21,14 @@ export class SVGCacheService {
     @Optional() @Inject(APP_BASE_HREF) private _appBase: string,
     @Optional() private _location: PlatformLocation,
     @Optional() private _config: InlineSVGConfig,
+    httpClient: HttpClient,
     httpBackend: HttpBackend,
-    rendererFactory: RendererFactory2) {
-    this._http = new HttpClient(httpBackend);
+    rendererFactory: RendererFactory2
+  ) {
+    this._http = _config && !_config.bypassHttpClientInterceptorChain
+      ? httpClient
+      : new HttpClient(httpBackend);
+
     this._renderer = rendererFactory.createRenderer(null, null);
 
     this.setBaseUrl();

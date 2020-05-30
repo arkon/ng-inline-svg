@@ -1,6 +1,7 @@
 export class InlineSVGConfig {
   baseUrl?: string;
   clientOnly?: boolean;
+  bypassHttpClientInterceptorChain?: boolean;
 }
 
 export const enum SVGScriptEvalMode {

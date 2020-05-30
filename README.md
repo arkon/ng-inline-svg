@@ -122,6 +122,9 @@ export class SVGConfig extends InlineSVGConfig {
 
     // If you don't want the directive to run on the server side.
     this.clientOnly = true;
+
+    // If you want to bypass your HttpClient interceptor chain when fetching SVGs.
+    this.bypassHttpClientInterceptorChain = true;
   }
 }
 ```
