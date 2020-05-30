@@ -81,7 +81,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     if (!this._isValidPlatform() || this._isSSRDisabled()) { return; }
 
-    if (changes['inlineSVG']) {
+    if (changes['inlineSVG'] || changes['setSVGAttributes']) {
       this._insertSVG();
     }
   }
