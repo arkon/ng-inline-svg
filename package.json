@@ -43,15 +43,15 @@
     "rxjs": "^6.5.0"
   },
   "devDependencies": {
-    "@angular/common": "^9.0.0",
-    "@angular/compiler": "^9.0.0",
-    "@angular/compiler-cli": "^9.0.0",
-    "@angular/core": "^9.0.0",
-    "@angular/platform-browser": "^9.0.0",
-    "rimraf": "^3.0.1",
-    "rxjs": "^6.5.4",
+    "@angular/common": "^9.1.9",
+    "@angular/compiler": "^9.1.9",
+    "@angular/compiler-cli": "^9.1.9",
+    "@angular/core": "^9.1.9",
+    "@angular/platform-browser": "^9.1.9",
+    "rimraf": "^3.0.2",
+    "rxjs": "^6.5.5",
     "tslint": "^6.0.0",
     "typescript": "~3.7.5",
-    "zone.js": "~0.10.2"
+    "zone.js": "~0.10.3"
   }
 }
