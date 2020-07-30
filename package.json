@@ -38,20 +38,20 @@
     "prepare": "npm run build"
   },
   "peerDependencies": {
-    "@angular/core": ">=9.0.0",
-    "@angular/common": ">=9.0.0",
-    "rxjs": "^6.5.0"
+    "@angular/core": ">=10.0.0",
+    "@angular/common": ">=10.0.0",
+    "rxjs": "^6.6.0"
   },
   "devDependencies": {
-    "@angular/common": "^9.1.9",
-    "@angular/compiler": "^9.1.9",
-    "@angular/compiler-cli": "^9.1.9",
-    "@angular/core": "^9.1.9",
-    "@angular/platform-browser": "^9.1.9",
+    "@angular/common": "^10.0.6",
+    "@angular/compiler": "^10.0.6",
+    "@angular/compiler-cli": "^10.0.6",
+    "@angular/core": "^10.0.6",
+    "@angular/platform-browser": "^10.0.6",
     "rimraf": "^3.0.2",
-    "rxjs": "^6.5.5",
-    "tslint": "^6.0.0",
-    "typescript": "~3.7.5",
+    "rxjs": "^6.6.0",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.7",
     "zone.js": "~0.10.3"
   }
 }
