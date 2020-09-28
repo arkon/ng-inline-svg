@@ -42,9 +42,9 @@ export class SVGCacheService {
   }
 
   getSVG(url: string, resolveSVGUrl: boolean, cache: boolean = true): Observable<SVGElement> {
-    const svgUrl = resolveSVGUrl
+    const svgUrl = (resolveSVGUrl
       ? this.getAbsoluteUrl(url)
-      : url;
+      : url).replace(/#.+$/, '');
 
     // Return cached copy if it exists
     if (cache && SVGCacheService._cache.has(svgUrl)) {
