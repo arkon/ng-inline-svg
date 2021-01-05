@@ -81,8 +81,9 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     if (!this._isValidPlatform() || this._isSSRDisabled()) { return; }
 
-    if (changes['inlineSVG'] || changes['setSVGAttributes']) {
-      this._insertSVG();
+    const setSVGAttributesChanged = Boolean(changes['setSVGAttributes']);
+    if (changes['inlineSVG'] || setSVGAttributesChanged) {
+      this._insertSVG(setSVGAttributesChanged);
     }
   }
 
@@ -92,7 +93,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private _insertSVG(): void {
+  private _insertSVG(force = false): void {
     if (!isPlatformServer(this.platformId) && !this._supportsSVG) { return; }
 
     // Check if a URL was actually passed into the directive
@@ -102,7 +103,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
 
     // Short circuit if SVG URL hasn't changed
-    if (this.inlineSVG === this._prevUrl) {
+    if (!force && this.inlineSVG === this._prevUrl) {
       return;
     }
     this._prevUrl = this.inlineSVG;

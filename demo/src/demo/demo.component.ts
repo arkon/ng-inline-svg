@@ -9,12 +9,18 @@ import { Component, OnInit } from '@angular/core';
     <div [inlineSVG]="'img/symbol.svg#fish'"></div>
     <div [inlineSVG]="'#fish'"></div>
     <div [inlineSVG]="'#fish'" [injectComponent]="true"></div>
+    <div><button (click)="updateSize(10)">Increase</button><button (click)="updateSize(-10)">Decrease</button></div>
+    <div [inlineSVG]="'#fish'" [setSVGAttributes]="_changeAttrs"></div>
     <div [inlineSVG]="'img/nope.svg'" [fallbackImgUrl]="'https://nodei.co/npm/ng-inline-svg.png?compact=true'"></div>
   `
 })
 export class DemoComponent implements OnInit {
   private _showOther: boolean = false;
   private _attrs = {
+    'width': '50',
+    'height': '50'
+  };
+  private _changeAttrs = {
     'width': '50',
     'height': '50'
   };
@@ -29,5 +35,12 @@ export class DemoComponent implements OnInit {
     console.log('Loaded SVG: ', svg, parent);
     svg.setAttribute('width', '100');
     return svg;
+  }
+
+  updateSize(value: number): void {
+    this._changeAttrs = {
+      'width': (parseInt(this._changeAttrs['width'], 10) + value).toString(),
+      'height': (parseInt(this._changeAttrs['height'], 10) + value).toString(),
+    };
   }
 }
