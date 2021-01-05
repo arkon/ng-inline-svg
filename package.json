@@ -1,6 +1,6 @@
 {
   "name": "ng-inline-svg",
-  "version": "11.0.1",
+  "version": "11.0.2",
   "description": "Angular directive for inserting an SVG inline within an element.",
   "repository": {
     "type": "git",
