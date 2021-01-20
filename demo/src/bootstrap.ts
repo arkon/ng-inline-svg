@@ -1,20 +1,12 @@
-import { NgModule, enableProdMode } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { BrowserModule } from '@angular/platform-browser';
+import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { InlineSVGModule } from 'ng-inline-svg';
 
-import { DemoComponent } from './demo/demo.component';
+import { DemoAppModule } from './demo/demo.module';
 
 import './styles/styles.scss';
 
 enableProdMode();
 
-@NgModule({
-  declarations: [DemoComponent],
-  imports: [BrowserModule, HttpClientModule, InlineSVGModule],
-  bootstrap: [DemoComponent]
-})
-class DemoAppModule {}
-
-platformBrowserDynamic().bootstrapModule(DemoAppModule);
+platformBrowserDynamic()
+  .bootstrapModule(DemoAppModule)
+  .catch(err => console.log(err));
