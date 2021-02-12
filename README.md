@@ -1,5 +1,9 @@
 # ng-inline-svg
 
+⚠️　**This package is not actively maintained.** ⚠️
+
+---
+
 [![NPM](https://nodei.co/npm/ng-inline-svg.png?compact=true)](https://nodei.co/npm/ng-inline-svg)
 
 **[Demo](https://echeung.me/ng-inline-svg)**
@@ -93,7 +97,7 @@ Here is one way to achieve this dynamically by adding an app initalizing service
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { InlineSVGConfig } from 'ng-inline-svg';
 import { SVGConfig } from './svg-config';
- 
+
 @NgModule({
   providers: [
     { provide: InlineSVGConfig, useClass: SVGConfig }
@@ -116,7 +120,7 @@ export class SVGConfig extends InlineSVGConfig {
     super();
 
     // When the server-side rendered app runs on localhost:3000, make sure baseURL is
-    // http://localhost:3000 and make sure the Express server is configured properly to 
+    // http://localhost:3000 and make sure the Express server is configured properly to
     // allow the URL of the asset folders storing the SVG files.
     this.baseUrl = 'http://localhost:3000';
 
