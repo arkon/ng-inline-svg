@@ -41,6 +41,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   @Input() forceEvalStyles: boolean = false;
   @Input() evalScripts: SVGScriptEvalMode = SVGScriptEvalMode.ALWAYS;
   @Input() fallbackImgUrl: string;
+  @Input() fallbackSVG: string;
   @Input() onSVGLoaded: (svg: SVGElement, parent: Element | null) => SVGElement;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
@@ -198,6 +199,9 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
       this._renderer.setAttribute(elImg, 'src', this.fallbackImgUrl);
 
       this._insertEl(elImg);
+    } else if (this.fallbackSVG && this.fallbackSVG !== this.inlineSVG) {
+      this.inlineSVG = this.fallbackSVG;
+      this._insertSVG();
     }
   }
 
