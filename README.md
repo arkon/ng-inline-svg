@@ -77,6 +77,7 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 | forceEvalStyles | boolean | `false` | Forces embeded style tags' contents to be evaluated (for IE 11). |
 | evalScripts | `'always'`, `'once'`, `'none'` | `'always'` | Whether to evaluate embedded scripts in the loaded SVG files. The `SVGScriptEvalMode` enum is also provided. |
 | fallbackImgUrl | string | | URL for a regular image to be displayed as a fallback if the SVG fails to load. |
+| fallbackSVG | string | | SVG filename to be displayed as a fallback if the SVG fails to load. |
 | onSVGLoaded | `(svg: SVGElement, parent: Element \| null) => SVGElement` | | Lifecycle hook that allows the loaded SVG to be manipulated prior to insertion. |
 
 #### Outputs
