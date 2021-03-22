@@ -199,7 +199,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
       this._renderer.setAttribute(elImg, 'src', this.fallbackImgUrl);
 
       this._insertEl(elImg);
-    } else if (this.fallbackSVG && this.fallbackSVG !== this.inlineSVG ) {
+    } else if (this.fallbackSVG && this.fallbackSVG !== this.inlineSVG) {
       this.inlineSVG = this.fallbackSVG;
       this._insertSVG();
     }
