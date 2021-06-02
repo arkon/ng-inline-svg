@@ -12,6 +12,7 @@ import { Component, OnInit } from '@angular/core';
     <div><button (click)="updateSize(10)">Increase</button><button (click)="updateSize(-10)">Decrease</button></div>
     <div [inlineSVG]="'#fish'" [setSVGAttributes]="_changeAttrs"></div>
     <div [inlineSVG]="'img/nope.svg'" [fallbackImgUrl]="'https://nodei.co/npm/ng-inline-svg.png?compact=true'"></div>
+    <div [inlineSVG]="'img/nope.svg'" [fallbackSVG]="'#fish'"></div>
   `
 })
 export class DemoComponent implements OnInit {

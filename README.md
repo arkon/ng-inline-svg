@@ -1,5 +1,9 @@
 # ng-inline-svg
 
+⚠️　**This package is not actively maintained.** ⚠️
+
+---
+
 [![NPM](https://nodei.co/npm/ng-inline-svg.png?compact=true)](https://nodei.co/npm/ng-inline-svg)
 
 **[Demo](https://echeung.me/ng-inline-svg)**
@@ -73,6 +77,7 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 | forceEvalStyles | boolean | `false` | Forces embeded style tags' contents to be evaluated (for IE 11). |
 | evalScripts | `'always'`, `'once'`, `'none'` | `'always'` | Whether to evaluate embedded scripts in the loaded SVG files. The `SVGScriptEvalMode` enum is also provided. |
 | fallbackImgUrl | string | | URL for a regular image to be displayed as a fallback if the SVG fails to load. |
+| fallbackSVG | string | | SVG filename to be displayed as a fallback if the SVG fails to load. |
 | isSVGString | boolean | `false` | Specify if you are providing a URL or a SVG as a string to the directive. |
 | onSVGLoaded | `(svg: SVGElement, parent: Element \| null) => SVGElement` | | Lifecycle hook that allows the loaded SVG to be manipulated prior to insertion. |
 
@@ -94,7 +99,7 @@ Here is one way to achieve this dynamically by adding an app initalizing service
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { InlineSVGConfig } from 'ng-inline-svg';
 import { SVGConfig } from './svg-config';
- 
+
 @NgModule({
   providers: [
     { provide: InlineSVGConfig, useClass: SVGConfig }
@@ -117,7 +122,7 @@ export class SVGConfig extends InlineSVGConfig {
     super();
 
     // When the server-side rendered app runs on localhost:3000, make sure baseURL is
-    // http://localhost:3000 and make sure the Express server is configured properly to 
+    // http://localhost:3000 and make sure the Express server is configured properly to
     // allow the URL of the asset folders storing the SVG files.
     this.baseUrl = 'http://localhost:3000';
 
