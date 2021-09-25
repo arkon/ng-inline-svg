@@ -1,8 +1,8 @@
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
-import { HttpBackend, HttpClient } from '@angular/common/http';
+import { HttpBackend, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable, Optional, Renderer2, RendererFactory2 } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { finalize, map, share } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { InlineSVGConfig } from './inline-svg.config';
 
 @Injectable({
@@ -59,8 +59,12 @@ export class SVGCacheService {
     // Otherwise, make the HTTP call to fetch
     const req = this._http.get(svgUrl, { responseType: 'text' })
       .pipe(
-        finalize(() => {
+        tap(() => {
           SVGCacheService._inProgressReqs.delete(svgUrl);
+        }),
+        catchError((error: HttpErrorResponse) => {
+          SVGCacheService._inProgressReqs.delete(svgUrl);
+          return throwError(error.message);
         }),
         share(),
         map((svgText: string) => {
