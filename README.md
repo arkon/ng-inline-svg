@@ -1,6 +1,4 @@
-# ng-inline-svg
-
-⚠️　**This package is deprecated and not maintained.** ⚠️
+# ng-inline-svg-2
 
 ---
 
@@ -8,7 +6,7 @@
 
 **[Demo](https://echeung.me/ng-inline-svg)**
 
-*Formerly called [ng2-inline-svg](https://github.com/arkon/ng2-inline-svg)*
+*Formerly called [ng-inline-svg](https://github.com/arkon/ng-inline-svg)*
 
 Angular directive for inserting an SVG inline within an element, allowing for easily styling
 with CSS like `fill: currentColor;`.
@@ -21,7 +19,7 @@ font icons.
 ## Installation
 
 ```shell
-npm install --save ng-inline-svg
+npm install --save ng-inline-svg-2
 ```
 
 
@@ -78,6 +76,7 @@ The SVG file (if found) will be inserted *inside* the element with the `[inlineS
 | evalScripts | `'always'`, `'once'`, `'none'` | `'always'` | Whether to evaluate embedded scripts in the loaded SVG files. The `SVGScriptEvalMode` enum is also provided. |
 | fallbackImgUrl | string | | URL for a regular image to be displayed as a fallback if the SVG fails to load. |
 | fallbackSVG | string | | SVG filename to be displayed as a fallback if the SVG fails to load. |
+| isSVGString | boolean | `false` | Specify if you are providing a URL or a SVG as a string to the directive. |
 | onSVGLoaded | `(svg: SVGElement, parent: Element \| null) => SVGElement` | | Lifecycle hook that allows the loaded SVG to be manipulated prior to insertion. |
 
 #### Outputs

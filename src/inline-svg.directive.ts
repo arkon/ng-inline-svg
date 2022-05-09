@@ -43,6 +43,7 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   @Input() fallbackImgUrl: string;
   @Input() fallbackSVG: string;
   @Input() onSVGLoaded: (svg: SVGElement, parent: Element | null) => SVGElement;
+  @Input() isSVGString: boolean = false;
 
   @Output() onSVGInserted: EventEmitter<SVGElement> = new EventEmitter<SVGElement>();
   @Output() onSVGFailed: EventEmitter<any> = new EventEmitter<any>();
@@ -97,9 +98,9 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
   private _insertSVG(force = false): void {
     if (!isPlatformServer(this.platformId) && !this._supportsSVG) { return; }
 
-    // Check if a URL was actually passed into the directive
+    // Check if a URL/string was actually passed into the directive
     if (!this.inlineSVG) {
-      this._fail('No URL passed to [inlineSVG]');
+      this._fail('No URL/string passed to [inlineSVG]');
       return;
     }
 
@@ -109,6 +110,15 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
     this._prevUrl = this.inlineSVG;
 
+    if (this.isSVGString) {
+      const svgElement = this._svgElementFromString(this.inlineSVG);
+      this._processSvg(svgElement);
+    } else {
+      this.insertSvgElementFromUrl();
+    }
+  }
+
+  private insertSvgElementFromUrl() {
     this._subscription = this._svgCache.getSVG(this.inlineSVG, this.resolveSVGUrl, this.cacheSVG)
       .subscribe(
         (svg: SVGElement) => {
@@ -160,6 +170,13 @@ export class InlineSVGDirective implements OnInit, OnChanges, OnDestroy {
     }
 
     this.onSVGInserted.emit(svg);
+  }
+
+  private _svgElementFromString(str: string): SVGElement | never {
+    const div = this._renderer.createElement('DIV');
+    div.innerHTML = str;
+
+    return div.querySelector('svg') as SVGElement;
   }
 
   /**
