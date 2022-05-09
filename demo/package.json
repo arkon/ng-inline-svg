@@ -15,33 +15,33 @@
     "deploy": "npm run build && gh-pages -d dist"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=10"
   },
   "dependencies": {
-    "@angular/common": "^6.0.0",
-    "@angular/compiler": "^6.0.0",
-    "@angular/core": "^6.0.0",
-    "@angular/platform-browser": "^6.0.0",
-    "@angular/platform-browser-dynamic": "^6.0.0",
-    "es6-shim": "^0.35.3",
+    "@angular/common": "^12.0.0",
+    "@angular/compiler": "^12.0.0",
+    "@angular/core": "^12.0.0",
+    "@angular/platform-browser": "^12.0.0",
+    "@angular/platform-browser-dynamic": "^12.0.0",
+    "es6-shim": "^0.35.6",
     "ng-inline-svg": "file:..",
-    "reflect-metadata": "^0.1.12",
-    "rxjs": "^6.1.0",
-    "zone.js": "^0.8.26"
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^6.6.3",
+    "zone.js": "~0.11.4"
   },
   "devDependencies": {
-    "copy-webpack-plugin": "^4.5.1",
-    "css-loader": "^0.28.11",
-    "extract-text-webpack-plugin": "^3.0.2",
-    "gh-pages": "^1.1.0",
+    "copy-webpack-plugin": "^5.1.1",
+    "css-loader": "^3.4.2",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "gh-pages": "^3.1.0",
     "html-webpack-plugin": "^3.2.0",
-    "node-sass": "^4.9.0",
-    "sass-loader": "^6.0.7",
-    "style-loader": "^0.21.0",
-    "ts-loader": "^3.4.0",
-    "typescript": "~2.7.2",
-    "uglifyjs-webpack-plugin": "^1.2.5",
-    "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.11.1"
+    "node-sass": "^4.14.1",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.1.3",
+    "ts-loader": "^6.2.1",
+    "typescript": "~4.2.3",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.2"
   }
 }

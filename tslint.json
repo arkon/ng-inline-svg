@@ -8,12 +8,7 @@
     "interface-name": [true, "always-prefix"],
     "jsdoc-format": true,
     "max-line-length": [true, 120],
-    "member-ordering": [
-      true,
-      "public-before-private",
-      "static-before-instance",
-      "variables-before-functions"
-    ],
+    "member-ordering": [true, {"order": "statics-first"}],
     "new-parens": true,
     "no-angle-bracket-type-assertion": true,
     "no-arg": true,
@@ -28,7 +23,6 @@
     "no-shadowed-variable": true,
     "no-trailing-whitespace": true,
     "no-unused-expression": true,
-    "no-use-before-declare": true,
     "no-var-keyword": true,
     "one-line": [
       true,
